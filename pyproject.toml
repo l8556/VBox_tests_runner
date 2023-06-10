@@ -13,7 +13,7 @@ rich = "*"
 psutil = "*"
 py7zr = "*"
 requests = "*"
-paramiko = "^3.2.0"
+paramiko = "*"
 
 
 [build-system]
