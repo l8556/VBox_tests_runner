@@ -7,6 +7,10 @@ class VirtualMachine:
     def __init__(self, vm_name:str):
         self.name = vm_name
 
+    def get_ip(self) -> str:
+        output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
+        return output.split(':')[1].strip()
+
     @staticmethod
     def _run_cmd(command):
         call(command, shell=True)

@@ -10,3 +10,4 @@ class Commands:
     controlvm: str = f'{vboxmanage} controlvm'
     startvm: str = f'{vboxmanage} startvm'
     showvminfo: str = f'{vboxmanage} showvminfo'
+    guestproperty: str = f"{vboxmanage} guestproperty get"
