@@ -19,7 +19,7 @@ class DesktopTests:
         ssh.upload_file(self.service_path,  '/etc/systemd/system/myscript.service')
         ssh.upload_file(self.script_path, '/home/l02/script.sh')
         ssh.ssh_exec('chmod +x /home/l02/script.sh')
-        ssh.ssh_exec('echo 2281500662 | sudo -S systemctl daemon-reload')
+        ssh.ssh_exec('sudo systemctl daemon-reload')
         ssh.ssh_exec('sudo systemctl enable myscript.service')
         ssh.ssh_exec("sudo systemctl start myscript.service")
         while ssh.exec_command('systemctl is-active myscript.service') == 'active':
