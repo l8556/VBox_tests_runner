@@ -77,9 +77,7 @@ class SshClient:
 
     def exec_command(self, command: str) -> str | None:
         stdin, stdout, stderr = self.client.exec_command(command)
-        output = stdout.read().decode('utf-8').strip()
-        print(output)
-        return output
+        return stdout.read().decode('utf-8').strip()
 
     def load_keys(self):
         try:

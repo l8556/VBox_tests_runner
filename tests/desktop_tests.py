@@ -6,7 +6,8 @@ from os.path import join, dirname, realpath
 from frameworks.VBox import VirtualMachine
 from frameworks.host_control import FileUtils
 from frameworks.ssh_client.ssh_client import SshClient
-
+from rich.console import Console
+console = Console()
 
 class DesktopTests:
     def __init__(self, version: str):
@@ -25,12 +26,12 @@ class DesktopTests:
         for machine_name in self.config['hosts']:
             vm = VirtualMachine(machine_name)
             ip = vm.get_ip()
-            if vm.check_status():
-                vm.stop()
-            vm.restore_snapshot()
+            # if vm.check_status():
+            #     vm.stop()
+            # vm.restore_snapshot()
             vm.run()
             self.run_script(ip, 'l02')
-            vm.stop()
+            # vm.stop()
 
     def run_script(self, host_ip:str, user:str):
         self.create_script_sh()
@@ -46,9 +47,15 @@ class DesktopTests:
             'sudo systemctl daemon-reload',
             "sudo systemctl start myscript.service"
         ])
-        while ssh.exec_command('systemctl is-active myscript.service') == 'active':
-            time.sleep(5)
-        ssh.download_file(self.report, join(self.report_dir, self.report_name))
+        with console.status("[red]Waiting for execute script") as status:
+            while ssh.exec_command('systemctl is-active myscript.service') == 'active':
+                status.update(ssh.exec_command('journalctl -n 20 -u myscript.service'))
+                time.sleep(0.1)
+        print(ssh.exec_command('journalctl -b -1 -u myscript.service'))
+        try:
+            ssh.download_file(self.report, join(self.report_dir, self.report_name))
+        except Exception as e:
+            print(f"Exceptions when download report: {e}")
 
     def create_script_sh(self):
         script_content = f'''\
