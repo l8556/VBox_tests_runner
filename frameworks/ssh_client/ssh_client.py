@@ -113,6 +113,7 @@ class SshClient:
             print(f"[green]|INFO| Exec command: {command}")
             ssh_channel.exec_command(command)
             while True:
+                time.sleep(0.5)
                 if ssh_channel.recv_ready():
                      print(ssh_channel.recv(4096).decode('utf-8'))
                 if ssh_channel.exit_status_ready():

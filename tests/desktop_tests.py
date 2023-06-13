@@ -54,8 +54,9 @@ class DesktopTests:
         script_content = f'''\
         #!/usr/bin/bash
         cd /home/l02/scripts/oo_desktop_testing
+        git pull
         source ~/.cache/pypoetry/virtualenvs/oo-desktop-testing-m1OQCp06-py3.10/bin/activate
         inv desktop -v {self.version}\
         '''
         with open(self.script_path, 'w', newline='') as file:
-            file.write(''.join(line.strip() for line in script_content.split('\n')))
+            file.write('\n'.join(line.strip() for line in script_content.split('\n')))
