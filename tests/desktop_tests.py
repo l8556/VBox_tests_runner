@@ -25,13 +25,13 @@ class DesktopTests:
     def run(self):
         for machine_name in self.config['hosts']:
             vm = VirtualMachine(machine_name)
-            ip = vm.get_ip()
-            # if vm.check_status():
-            #     vm.stop()
-            # vm.restore_snapshot()
-            vm.run()
-            self.run_script(ip, 'l02')
-            # vm.stop()
+            if vm.check_status():
+                vm.stop()
+            vm.restore_snapshot()
+            vm.run(headless=True)
+            self.run_script(vm.get_ip(), 'l02')
+            vm.stop()
+
 
     def run_script(self, host_ip:str, user:str):
         self.create_script_sh()

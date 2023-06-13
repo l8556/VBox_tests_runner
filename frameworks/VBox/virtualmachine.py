@@ -4,6 +4,8 @@ import time
 from .commands import Commands as cmd
 from subprocess import call, getoutput
 from rich import print
+from rich.console import Console
+console = Console()
 
 class VirtualMachine:
     def __init__(self, vm_name:str):
@@ -14,8 +16,13 @@ class VirtualMachine:
 
     def get_ip(self) -> str:
         print(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
-        output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
-        return output.split(':')[1].strip()
+        with console.status("[red]Waiting for Net up") as status:
+            while True:
+                output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
+                status.update("[red]Waiting for Net up...")
+                if output and output != 'No value set!':
+                    return output.split(':')[1].strip()
+                time.sleep(0.2)
 
     @staticmethod
     def _run_cmd(command):
