@@ -13,6 +13,7 @@ class VirtualMachine:
         self._run_cmd(f"{cmd.wait} {self.name} VBoxServiceHeartbeat")
 
     def get_ip(self) -> str:
+        print(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
         output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
         return output.split(':')[1].strip()
 
