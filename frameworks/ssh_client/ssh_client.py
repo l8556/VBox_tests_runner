@@ -82,7 +82,7 @@ class SshClient:
         self.client.close()
 
     def create_ssh_chanel(self):
-        self.ssh = self.client.get_transport().open_session()
+        self.ssh = self.client.invoke_shell()
 
     def close_ssh_chanel(self):
         if self.ssh is not None:
@@ -91,14 +91,23 @@ class SshClient:
     def ssh_exec(self, command):
         if self.ssh is not None:
             print(f"[green]|INFO| Exec command: {command}")
-            self.ssh.exec_command(command)
-            while True:
-                if self.ssh.recv_ready():
-                    output = self.ssh.recv(4096).decode('utf-8')
-                    print(output)
-                if self.ssh.exit_status_ready():
-                    break
+            self.ssh.send(f'{command}\n')
+            time.sleep(1)
+            while not self.ssh.recv_ready():
+                time.sleep(0.5)
+            return
         print(f"[red]|WARNING| SSH Chanel not created")
+
+    def ssh_exec_commands(self, commands: list):
+        for command in commands:
+            ssh_channel = self.client.get_transport().open_session()
+            print(f"[green]|INFO| Exec command: {command}")
+            ssh_channel.exec_command(command)
+            while True:
+                if ssh_channel.recv_ready():
+                     print(ssh_channel.recv(4096).decode('utf-8'))
+                if ssh_channel.exit_status_ready():
+                    break
 
     def wait_command(self):
         while not self.ssh.exit_status_ready():
