@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import time
+
 from .commands import Commands as cmd
 from subprocess import call, getoutput
 from rich import print
@@ -6,6 +8,9 @@ from rich import print
 class VirtualMachine:
     def __init__(self, vm_name:str):
         self.name = vm_name
+
+    def wait_boot(self):
+        self._run_cmd(f"{cmd.wait} {self.name} VBoxServiceHeartbeat")
 
     def get_ip(self) -> str:
         output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
@@ -19,7 +24,7 @@ class VirtualMachine:
         return getoutput(f"{cmd.snapshot} {self.name} list").split('\n')
 
     def run(self, headless: bool = False) -> None:
-        if self._check_status() is False:
+        if self.check_status() is False:
             print(f"[green]|INFO| Starting VirtualMachine: {self.name}")
             return self._run_cmd(f'{cmd.startvm} {self.name}{" --type headless" if headless else ""}')
         print(f"[red]|INFO| VirtualMachine {self.name} already is running")
@@ -28,13 +33,13 @@ class VirtualMachine:
         self._run_cmd(f"{cmd.snapshot} {self.name} take {name}")
 
     def status(self):
-        match self._check_status():
+        match self.check_status():
             case True:
                 print(f"[green]|INFO| VirtualMachine {self.name} is running")
             case False:
                 print(f"[red]|INFO| VirtualMachine {self.name} is poweroff")
 
-    def _check_status(self) -> bool:
+    def check_status(self) -> bool:
         match self.get_parameter_info('VMState'):
             case "poweroff":
                 return False
@@ -58,3 +63,4 @@ class VirtualMachine:
     def stop(self):
         print(f"[green]|INFO| Shutting down the virtual machine {self.name}")
         self._run_cmd(f'{cmd.controlvm} {self.name} poweroff')
+        time.sleep(5)

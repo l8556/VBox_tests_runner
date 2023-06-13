@@ -11,3 +11,4 @@ class Commands:
     startvm: str = f'{vboxmanage} startvm'
     showvminfo: str = f'{vboxmanage} showvminfo'
     guestproperty: str = f"{vboxmanage} guestproperty get"
+    wait: str = f'{vboxmanage} guestproperty wait'

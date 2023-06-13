@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+import os
 import time
+from os.path import basename
 
 import paramiko
 from paramiko.client import SSHClient
@@ -15,19 +17,54 @@ class SshClient:
         self.sftp = None
 
     def __del__(self):
+        self.close_sftp_chanel()
         self.close_ssh_chanel()
         self.close()
 
-    def upload_file(self, local, remote):
-        sftp = self.client.open_sftp()
-        sftp.put(local, remote)
+    def close_sftp_chanel(self):
+        if self.sftp:
+            self.sftp.close()
 
-    def connect(self, username: str):
-        try:
-            self.load_keys()
-            self.client.connect(self.host, username=username)
-        except Exception as e:
-            print(f"[red]|ERROR| Failed to connect: {username}@{self.host}. Exception: {e}")
+    def upload_file(self, local, remote):
+        if self.sftp:
+            print(f'[green]|INFO| Upload file: {basename(local)} to {remote}')
+            self.sftp.putfo(open(local, 'rb'), remote)
+            local_file_size = os.stat(local).st_size
+            while True:
+                remote_file_size = self.sftp.stat(remote).st_size
+                if remote_file_size == local_file_size:
+                    break
+        else:
+            print(f'[red]|WARNING| Sftp chanel not created.')
+
+    def create_sftp_chanel(self):
+        self.sftp = self.client.open_sftp()
+
+    def connect(self, username: str, timeout: int = 300):
+        print(f"[green]|INFO| Connect to host: {self.host}")
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            try:
+                self.load_keys()
+                self.client.connect(self.host, username=username)
+                self.create_ssh_chanel()
+                self.create_sftp_chanel()
+                print('[green]|INFO|Connected')
+                break
+
+            except paramiko.AuthenticationException:
+                print('Authentication failed. Waiting and retrying...')
+                time.sleep(3)
+                continue
+            except paramiko.SSHException as e:
+                print(f'SSH error: {e}. Waiting and retrying...')
+                time.sleep(3)
+                continue
+            except Exception as e:
+                print(f"[red]|ERROR| Failed to connect: {username}@{self.host}. Exception: {e}\n"
+                      f"Waiting and retrying...")
+                time.sleep(3)
+                continue
 
     def exec_command(self, command: str) -> str | None:
         stdin, stdout, stderr = self.client.exec_command(command)
@@ -45,7 +82,7 @@ class SshClient:
         self.client.close()
 
     def create_ssh_chanel(self):
-        self.ssh = self.client.invoke_shell()
+        self.ssh = self.client.get_transport().open_session()
 
     def close_ssh_chanel(self):
         if self.ssh is not None:
@@ -54,11 +91,13 @@ class SshClient:
     def ssh_exec(self, command):
         if self.ssh is not None:
             print(f"[green]|INFO| Exec command: {command}")
-            self.ssh.send(f'{command}\n')
-            time.sleep(0.5)
-            while not  self.ssh.recv_ready():
-                time.sleep(0.1)
-            return
+            self.ssh.exec_command(command)
+            while True:
+                if self.ssh.recv_ready():
+                    output = self.ssh.recv(4096).decode('utf-8')
+                    print(output)
+                if self.ssh.exit_status_ready():
+                    break
         print(f"[red]|WARNING| SSH Chanel not created")
 
     def wait_command(self):
