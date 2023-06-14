@@ -27,3 +27,10 @@ def stop_vm(c, name: str = ''):
 @task
 def vm_list(c):
     print(Vbox.vm_list())
+
+@task
+def out_info(c, name: str = ''):
+    if name in [vm.split()[0].replace('"', '') for vm in Vbox.vm_list()]:
+        VirtualMachine(name).out_info()
+        return
+    print(f"[bold red]|ERROR| The Virtual Machine {name} not exists. Vm list:\n{Vbox.vm_list()}")

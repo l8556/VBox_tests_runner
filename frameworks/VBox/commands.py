@@ -12,3 +12,4 @@ class Commands:
     showvminfo: str = f'{vboxmanage} showvminfo'
     guestproperty: str = f"{vboxmanage} guestproperty get"
     wait: str = f'{vboxmanage} guestproperty wait'
+    enumerate: str = f'{vboxmanage} guestproperty enumerate'

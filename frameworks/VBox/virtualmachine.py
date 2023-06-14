@@ -97,3 +97,6 @@ class VirtualMachine:
         print(f"[green]|INFO| Shutting down the virtual machine {self.name}")
         self._run_cmd(f'{cmd.controlvm} {self.name} poweroff')
         time.sleep(5)
+
+    def out_info(self):
+        self._run_cmd(f'{cmd.enumerate} {self.name}')
