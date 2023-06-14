@@ -1,5 +1,7 @@
 {
+  "desktop_script": "https://github.com/l8556/oo_desktop_testing.git",
   "hosts": [
+    "Ubuntu16",
     "Kubuntu",
     "CentOs9"
   ]
