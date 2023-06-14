@@ -6,6 +6,9 @@ from os.path import basename
 import paramiko
 from paramiko.client import SSHClient
 from rich import print
+from rich.console import Console
+
+console = Console()
 
 
 class SshClient:
@@ -74,6 +77,17 @@ class SshClient:
                 print(f"[red]|ERROR| Failed to connect: {username}@{self.host}.\nWaiting and retrying...")
                 time.sleep(3)
                 continue
+
+    def wait_execute_service(self, service_name: str, timeout: int = None):
+        start_time = time.time()
+        with console.status(f"[red]Waiting for execute {service_name}") as status:
+            while self.exec_command(f'systemctl is-active {service_name}') == 'active':
+                status.update(self.exec_command(f'journalctl -n 20 -u {service_name}'))
+                time.sleep(0.1)
+                if isinstance(timeout, int) and (time.time() - start_time) >= timeout:
+                    print(f'[bold red]|WARNING| The service {service_name} waiting time has expired ')
+                    break
+        console.print(self.exec_command(f'journalctl -n 1000 -u {service_name}'))
 
     def exec_command(self, command: str) -> str | None:
         stdin, stdout, stderr = self.client.exec_command(command)

@@ -62,8 +62,7 @@ class DesktopTests:
         self._change_vm_service_dir_access(ssh)
         self._upload_files(ssh)
         self._start_my_service(ssh)
-        self._wait_execute_script(ssh)
-        ssh.ssh_exec(f'sudo systemctl disable {self.vm.my_service_name}')
+        self._wait_execute_service(ssh)
         self._download_report(ssh)
 
     def _upload_files(self, ssh: SshClient):
@@ -85,12 +84,9 @@ class DesktopTests:
             f'sudo chmod u+w {self.vm.services_dir}'
         ])
 
-    def _wait_execute_script(self, ssh: SshClient):
-        with console.status("[red]Waiting for execute script") as status:
-            while ssh.exec_command(f'systemctl is-active {self.vm.my_service_name}') == 'active':
-                status.update(ssh.exec_command(f'journalctl -n 20 -u {self.vm.my_service_name}'))
-                time.sleep(0.1)
-        console.print(ssh.exec_command(f'journalctl -n 1000 -u {self.vm.my_service_name}'))
+    def _wait_execute_service(self, ssh: SshClient):
+        ssh.wait_execute_service(self.vm.my_service_name)
+        ssh.ssh_exec(f'sudo systemctl disable {self.vm.my_service_name}')
 
     def _download_report(self, ssh: SshClient):
         try:
