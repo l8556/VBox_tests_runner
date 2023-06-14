@@ -14,21 +14,36 @@ class VirtualMachine:
     def wait_boot(self):
         self._run_cmd(f"{cmd.wait} {self.name} VBoxServiceHeartbeat")
 
+    def get_logged_user(self, timeout: int = 300) -> str | None:
+        start_time = time.time()
+        with console.status("[red]Waiting for Logged In Users List") as status:
+            while time.time() - start_time < timeout:
+                output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/OS/LoggedInUsersList"')
+                status.update(f"[red]Waiting for Logged In Users List: {(time.time() - start_time):.02f}/{timeout}")
+                if output and output != 'No value set!':
+                    console.print(f'[green]|INFO| List of logged-in users {output}')
+                    if len(output.split(':')) >= 2:
+                        return output.split(':')[1].strip()
+                    raise print(f"[red]|ERROR| Cant get logged-in users output: {output}")
+            raise print(
+                f"[red]|ERROR| Waiting time for the virtual machine {self.name} Logged In Users List has expired"
+            )
+
+
+
     def wait_net_up(self, timeout: int = 300):
         start_time = time.time()
-        with console.status("[red]Waiting for Net up") as status:
+        with console.status("[red]Waiting for network adapter up") as status:
             while time.time() - start_time < timeout:
                 output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
-                status.update(f"[red]Waiting for Net up: {(time.time() - start_time):.02f}/{timeout}")
+                status.update(f"[red]Waiting for network adapter up: {(time.time() - start_time):.02f}/{timeout}")
                 if output and output != 'No value set!':
                     return console.print(f'[green]|INFO| The network adapter is running, ip: {output}')
-                time.sleep(0.2)
             raise print(
                 f"[red]|ERROR|Waiting time for the virtual machine {self.name} network adapter to start has expired"
             )
 
     def get_ip(self) -> str:
-        print(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
         output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
         if output and output != 'No value set!':
             return output.split(':')[1].strip()
