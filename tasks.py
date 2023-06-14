@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
-import os
-from os.path import join
-
 from invoke import task
 from rich.prompt import Prompt
-
-from frameworks.host_control import FileUtils
 from tests.desktop_tests import DesktopTests
 
 @task
