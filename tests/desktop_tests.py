@@ -30,6 +30,7 @@ class DesktopTests:
             self.run_script_on_vm()
             running_vm.stop()
         self._merge_reports()
+        FileUtils.delete(self.host.tmp_dir, all_from_folder=True)
 
     def _create_vm_data(self, running_vm, machine_name):
         return LinuxData(
@@ -89,7 +90,7 @@ class DesktopTests:
             while ssh.exec_command(f'systemctl is-active {self.vm.my_service_name}') == 'active':
                 status.update(ssh.exec_command(f'journalctl -n 20 -u {self.vm.my_service_name}'))
                 time.sleep(0.1)
-        console.print(ssh.exec_command(f'journalctl -b -1 -u {self.vm.my_service_name}'))
+        console.print(ssh.exec_command(f'journalctl -n 1000 -u {self.vm.my_service_name}'))
 
     def _download_report(self, ssh: SshClient):
         try:
