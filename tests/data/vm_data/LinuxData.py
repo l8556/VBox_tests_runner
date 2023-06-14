@@ -13,7 +13,7 @@ class LinuxData(VmData):
         self.script_path = f'{self.home_dir}/script.sh'
         self.desktop_script_dir = f"{self.home_dir}/scripts/oo_desktop_testing"
         self.venv_path =  f"{self.desktop_script_dir}/.venv/bin/activate"
-        self.report_path = f'{self.desktop_script_dir}/reports/{self.version}_desktop_report.csv',
+        self.report_path = f'{self.desktop_script_dir}/reports/{self.version}_desktop_report.csv'
         self.tg_dir = f"{self.home_dir}/.telegram"
         self.tg_token_file = f"{self.tg_dir}/token"
         self.tg_chat_id_file = f"{self.tg_dir}/chat"
