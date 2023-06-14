@@ -15,7 +15,7 @@ from requests import get, head
 from rich import print
 from rich.progress import track
 
-from .HostInfo import HostInfo
+from .host_info import HostInfo
 
 
 class FileUtils:
@@ -64,7 +64,8 @@ class FileUtils:
             names: list = None,
             exceptions_files: list = None,
             exceptions_dirs: list = None,
-            dir_include: str = None
+            dir_include: str = None,
+            name_include: str = None
     ) -> list:
         ext_dirs = [join(path, ext_path) for ext_path in exceptions_dirs] if exceptions_dirs else ...
 
@@ -76,6 +77,8 @@ class FileUtils:
                 if exceptions_dirs and [path for path in ext_dirs if path in root]:
                     continue
                 if dir_include and dir_include not in basename(root):
+                    continue
+                if name_include and name_include not in filename:
                     continue
                 if names:
                     file_paths.append(join(root, filename)) if filename in names else ...
@@ -249,8 +252,8 @@ class FileUtils:
             return file.read()
 
     @staticmethod
-    def file_writer(file_path, text, mode='w'):
-        with open(file_path, mode) as file:
+    def file_writer(file_path, text, mode='w', newline=''):
+        with open(file_path, mode=mode, newline=newline) as file:
             file.write(text)
 
     @staticmethod

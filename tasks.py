@@ -4,6 +4,7 @@ from os.path import join
 
 from invoke import task
 
+from frameworks.VBox import VirtualMachine
 from frameworks.host_control import FileUtils
 from tests.desktop_tests import DesktopTests
 

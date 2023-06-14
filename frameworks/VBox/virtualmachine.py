@@ -14,15 +14,25 @@ class VirtualMachine:
     def wait_boot(self):
         self._run_cmd(f"{cmd.wait} {self.name} VBoxServiceHeartbeat")
 
+    def wait_net_up(self, timeout: int = 300):
+        start_time = time.time()
+        with console.status("[red]Waiting for Net up") as status:
+            while time.time() - start_time < timeout:
+                output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
+                status.update(f"[red]Waiting for Net up: {(time.time() - start_time):.02f}/{timeout}")
+                if output and output != 'No value set!':
+                    return console.print(f'[green]|INFO| The network adapter is running, ip: {output}')
+                time.sleep(0.2)
+            raise print(
+                f"[red]|ERROR|Waiting time for the virtual machine {self.name} network adapter to start has expired"
+            )
+
     def get_ip(self) -> str:
         print(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
-        with console.status("[red]Waiting for Net up") as status:
-            while True:
-                output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
-                status.update("[red]Waiting for Net up...")
-                if output and output != 'No value set!':
-                    return output.split(':')[1].strip()
-                time.sleep(0.2)
+        output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
+        if output and output != 'No value set!':
+            return output.split(':')[1].strip()
+        raise print(f"[red]|ERROR| Failed to get the ip address of the virtual machine: {self.name}")
 
     @staticmethod
     def _run_cmd(command):

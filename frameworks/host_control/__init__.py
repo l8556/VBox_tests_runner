@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 from .FileUtils import FileUtils
-from .HostInfo import HostInfo
+from .host_info import HostInfo

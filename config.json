@@ -1,4 +1,7 @@
 {
   "version": "7.4.0.150",
-  "hosts": ["Kubuntu"]
+  "hosts": [
+    "Kubuntu",
+    "CentOs9"
+  ]
 }

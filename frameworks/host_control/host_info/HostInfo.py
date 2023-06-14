@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-from platform import system, machine
+from platform import system, machine, version
+from rich import print
 
-from ..decorators.decorators import singleton
+from frameworks.decorators.decorators import singleton
+from .Unix import Unix
 
 
 @singleton
@@ -9,6 +11,13 @@ class HostInfo:
     def __init__(self):
         self.os = system().lower()
         self.__arch = machine().lower()
+
+    def name(self, pretty: bool = False) -> str | None:
+        return self.os if self.os == 'windows' else Unix().pretty_name if pretty else Unix().id
+
+    @property
+    def version(self) -> str | None:
+        return version() if self.os == 'windows' else Unix().version
 
     @property
     def os(self):
