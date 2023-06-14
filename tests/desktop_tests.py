@@ -21,17 +21,19 @@ class DesktopTests:
         self.report_name = f'{self.version}_{HostInfo().name(pretty=True)}_desktop_report.csv'
         self.report = f'/home/l02/scripts/oo_desktop_testing/reports/{self.report_name}'
         self.report_dir = join(os.getcwd(), 'reports')
-        FileUtils.create_dir(self.report_dir)
+        FileUtils.create_dir(self.report_dir, silence=True)
+        self.user = None
 
     def run(self):
         for machine_name in self.config['hosts']:
+            self.user = 'l02'
             vm = VirtualMachine(machine_name)
             if vm.check_status():
                 vm.stop()
             vm.restore_snapshot()
             vm.run(headless=True)
             vm.wait_net_up()
-            self.run_script(vm.get_ip(), 'l02')
+            self.run_script(vm.get_ip(), self.user)
             vm.stop()
 
     def _merge_reports(self):
@@ -45,7 +47,7 @@ class DesktopTests:
         ssh.ssh_exec('mkdir /home/l02/.telegram')
         self._upload_files(ssh)
         ssh.ssh_exec_commands([
-            'chmod +x /home/l02/script.sh',
+            f'chmod +x /home/{self.user}/script.sh',
             'sudo systemctl daemon-reload',
             "sudo systemctl start myscript.service"
         ])
@@ -53,8 +55,12 @@ class DesktopTests:
         self._download_report(ssh)
 
     def _upload_files(self, ssh):
-        ssh.upload_file(self.token, '/home/l02/.telegram/token')
-        ssh.upload_file(self.chat, '/home/l02/.telegram/chat')
+        ssh.upload_file(self.token, f'/home/{self.user}/.telegram/token')
+        ssh.upload_file(self.chat, f'/home/{self.user}/.telegram/chat')
+        ssh.ssh_exec_commands([
+            f'sudo chown {self.user}:{self.user} /etc/systemd/system/',
+            'sudo chmod u+w /etc/systemd/system/'
+            ])
         ssh.upload_file(self.service_path, '/etc/systemd/system/myscript.service')
         ssh.upload_file(self.create_script_sh(), '/home/l02/script.sh')
 
