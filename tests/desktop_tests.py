@@ -72,6 +72,8 @@ class DesktopTests:
         ssh.upload_file(self._create_file(join(self.host.tmp_dir, 'script.sh'),self.vm.script_sh()), self.vm.script_path)
 
     def _start_my_service(self, ssh: SshClient):
+        # clean journal
+        ssh.ssh_exec(f"sudo rm /var/log/journal/*/*.journal")
         ssh.ssh_exec_commands(self.vm.start_service_commands)
 
     def _create_vm_dirs(self, ssh: SshClient):
