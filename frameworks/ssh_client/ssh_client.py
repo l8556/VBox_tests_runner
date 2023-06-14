@@ -40,7 +40,7 @@ class SshClient:
     def download_file(self, remote, local):
         if self.sftp:
             with open(local, 'wb') as local_file:
-                transfer = self.sftp.getfo(remote, local_file)
+                self.sftp.getfo(remote, local_file)
                 remote_file_size = self.sftp.stat(remote).st_size
                 while local_file.tell() < remote_file_size:
                     time.sleep(0.2)
