@@ -18,8 +18,6 @@ class DesktopTests:
         self.script_path = join(dirname(realpath(__file__)), 'scripts', 'script.sh')
         self.token = join(os.path.expanduser('~'), '.telegram', 'token')
         self.chat = join(os.path.expanduser('~'), '.telegram', 'chat')
-        self.report_name = f'{self.version}_{HostInfo().name(pretty=True)}_desktop_report.csv'
-        self.report = f'/home/l02/scripts/oo_desktop_testing/reports/{self.report_name}'
         self.report_dir = join(os.getcwd(), 'reports')
         FileUtils.create_dir(self.report_dir, silence=True)
         self.user = None
@@ -33,7 +31,7 @@ class DesktopTests:
             vm.restore_snapshot()
             vm.run(headless=True)
             vm.wait_net_up()
-            self.run_script(vm.get_ip(), self.user)
+            self.run_script(vm.get_ip(), self.user, machine_name)
             vm.stop()
 
     def _merge_reports(self):
@@ -41,10 +39,10 @@ class DesktopTests:
         print(reports)
         Report().merge(reports,  join(self.report_dir, f"{self.version}_full_report.csv"))
 
-    def run_script(self, host_ip:str, user:str):
+    def run_script(self, host_ip: str, user: str, machine_name: str):
         ssh = SshClient(host_ip)
         ssh.connect(user)
-        ssh.ssh_exec('mkdir /home/l02/.telegram')
+        ssh.ssh_exec(f'mkdir /home/{self.user}/.telegram')
         self._upload_files(ssh)
         ssh.ssh_exec_commands([
             f'chmod +x /home/{self.user}/script.sh',
@@ -52,7 +50,7 @@ class DesktopTests:
             "sudo systemctl start myscript.service"
         ])
         self._wait_execute_script(ssh)
-        self._download_report(ssh)
+        self._download_report(ssh, machine_name)
 
     def _upload_files(self, ssh):
         ssh.upload_file(self.token, f'/home/{self.user}/.telegram/token')
@@ -72,9 +70,12 @@ class DesktopTests:
                 time.sleep(0.1)
         console.print(ssh.exec_command('journalctl -b -1 -u myscript.service'))
 
-    def _download_report(self, ssh: SshClient):
+    def _download_report(self, ssh: SshClient, machine_name: str):
         try:
-            ssh.download_file(self.report, join(self.report_dir, self.report_name))
+            ssh.download_file(
+                f'/home/{self.user}/scripts/oo_desktop_testing/reports/{self.version}_desktop_report.csv',
+                join(self.report_dir, f'{self.version}_{machine_name}_desktop_report.csv')
+            )
         except Exception as e:
             print(f"Exceptions when download report: {e}")
 

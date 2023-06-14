@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-cd /home/l02/scripts/oo_desktop_testing
+cd ~/scripts/oo_desktop_testing
 git pull
-source ~/.cache/pypoetry/virtualenvs/oo-desktop-testing-m1OQCp06-py3.10/bin/activate
+source ~/scripts/oo_desktop_testing/.venv/bin/activate
 inv desktop -v 7.4.0.163
