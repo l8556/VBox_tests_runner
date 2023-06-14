@@ -4,6 +4,4 @@ from subprocess import getoutput
 class Vbox:
     @staticmethod
     def vm_list() -> list:
-        output = getoutput(cmd.list)
-        print(output)
-        return output.split('\n')
+        return getoutput(cmd.list).split('\n')
