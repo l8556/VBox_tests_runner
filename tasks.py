@@ -17,9 +17,13 @@ def run_vm(c, name: str = '', headless=False):
         vm = VirtualMachine(name)
         vm.run(headless=headless)
         vm.wait_net_up()
-        return print(vm.get_ip())
+        return print(vm.get_ip()), print(vm.get_logged_user())
     print(f"[bold red]|ERROR| The Virtual Machine {name} not exists. Vm list:\n{Vbox.vm_list()}")
 
 @task
 def stop_vm(c, name: str = ''):
     VirtualMachine(name).stop()
+
+@task
+def vm_list(c):
+    print(Vbox.vm_list())
