@@ -70,7 +70,7 @@ class DesktopTests:
             while ssh.exec_command('systemctl is-active myscript.service') == 'active':
                 status.update(ssh.exec_command('journalctl -n 20 -u myscript.service'))
                 time.sleep(0.1)
-        print(ssh.exec_command('journalctl -b -1 -u myscript.service'))
+        console.print(ssh.exec_command('journalctl -b -1 -u myscript.service'))
 
     def _download_report(self, ssh: SshClient):
         try:
