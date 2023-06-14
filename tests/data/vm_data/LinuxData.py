@@ -24,6 +24,7 @@ class LinuxData(VmData):
     @property
     def start_service_commands(self) -> list:
         return [
+            f"sudo journalctl -u {self.my_service_name} --vacuum-size=0",
             f'chmod +x {self.script_path}',
             'sudo systemctl daemon-reload',
             f'sudo systemctl start {self.my_service_name}'
