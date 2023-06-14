@@ -40,7 +40,7 @@ class VirtualMachine:
                 if output and output != 'No value set!':
                     return console.print(f'[green]|INFO| The network adapter is running, ip: {output}')
             raise print(
-                f"[red]|ERROR|Waiting time for the virtual machine {self.name} network adapter to start has expired"
+                f"[red]|ERROR| Waiting time for the virtual machine {self.name} network adapter to start has expired"
             )
 
     def get_ip(self) -> str:

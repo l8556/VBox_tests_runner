@@ -1,124 +1,103 @@
 # -*- coding: utf-8 -*-
-import json
 import os.path
 import time
-from dataclasses import dataclass, field
 
-from os.path import join, dirname, realpath
+from os.path import join
 
 from frameworks.VBox import VirtualMachine
-from frameworks.host_control import FileUtils, HostInfo
+from frameworks.host_control import FileUtils
 from frameworks.report import Report
 from frameworks.ssh_client.ssh_client import SshClient
 from rich.console import Console
+
+from tests.data import LinuxData, HostData
+
 console = Console()
-
-@dataclass(frozen=True)
-class TestData:
-    project_dir: str = join(os.getcwd())
-    tg_token: str = join(os.path.expanduser('~'), '.telegram', 'token')
-    tg_chat_id: str = join(os.path.expanduser('~'), '.telegram', 'chat')
-    tmp_dir: str = join(project_dir, 'tmp')
-    service_path: str = join(dirname(realpath(__file__)), 'scripts', 'myscript.service')
-
 
 class DesktopTests:
     def __init__(self, version: str):
         self.testing_hosts = FileUtils.read_json(join(os.getcwd(), 'config.json'))['hosts']
         self.version = version
-        self.service_path = TestData.service_path
-        self.tmp_dir = TestData.tmp_dir
-        self.token = TestData.tg_token
-        self.chat = TestData.tg_chat_id
-        self.report_dir = join(os.getcwd(), 'reports', self.version)
-        self.user = None
-        FileUtils.create_dir((self.report_dir, self.tmp_dir), silence=True)
+        self.vm = None
+        self.host = HostData()
+        self.report_dir = join(self.host.report_dir, self.version)
+        FileUtils.create_dir((self.report_dir, self.host.tmp_dir), silence=True)
 
     def run(self):
         for machine_name in self.testing_hosts:
-            vm = VirtualMachine(machine_name)
-            if vm.check_status():
-                vm.stop()
-            vm.restore_snapshot()
-            vm.run(headless=True)
-            vm.wait_net_up()
-            self.user = vm.get_logged_user()
-            self.run_script(vm.get_ip(), self.user, machine_name)
-            vm.stop()
+            running_vm = self._run_vm(machine_name)
+            self.vm = self._create_vm_data(running_vm, machine_name)
+            self.run_script_on_vm()
+            running_vm.stop()
         self._merge_reports()
+
+    def _create_vm_data(self, running_vm, machine_name):
+        return LinuxData(
+            user=running_vm.get_logged_user(),
+            version=self.version,
+            ip=running_vm.get_ip(),
+            name=machine_name
+        )
+
+    @staticmethod
+    def _run_vm(machine_name) -> VirtualMachine:
+        vm = VirtualMachine(machine_name)
+        if vm.check_status():
+            vm.stop()
+        vm.restore_snapshot()
+        vm.run(headless=True)
+        vm.wait_net_up()
+        return vm
+
 
     def _merge_reports(self):
         reports = FileUtils.get_paths(self.report_dir, name_include=f"{self.version}")
         Report().merge(reports,  join(self.report_dir, f"{self.version}_full_report.csv"))
 
-    def run_script(self, host_ip: str, user: str, machine_name: str):
-        ssh = SshClient(host_ip)
-        ssh.connect(user)
-        ssh.ssh_exec(f'mkdir /home/{self.user}/.telegram')
+    def run_script_on_vm(self):
+        ssh = SshClient(self.vm.ip)
+        ssh.connect(self.vm.user)
+        self._create_vm_dirs(ssh)
+        self._change_vm_service_dir_access(ssh)
         self._upload_files(ssh)
-        ssh.ssh_exec_commands([
-            f'chmod +x /home/{self.user}/script.sh',
-            'sudo systemctl daemon-reload',
-            "sudo systemctl start myscript.service"
-        ])
+        self._start_my_service(ssh)
         self._wait_execute_script(ssh)
-        ssh.ssh_exec(f'sudo systemctl disable myscript.service')
-        self._download_report(ssh, machine_name)
+        ssh.ssh_exec(f'sudo systemctl disable {self.vm.my_service_name}')
+        self._download_report(ssh)
 
-    def _upload_files(self, ssh):
-        ssh.upload_file(self.token, f'/home/{self.user}/.telegram/token')
-        ssh.upload_file(self.chat, f'/home/{self.user}/.telegram/chat')
+    def _upload_files(self, ssh: SshClient):
+        ssh.upload_file(self.host.tg_token, self.vm.tg_token_file)
+        ssh.upload_file(self.host.tg_chat_id, self.vm.tg_chat_id_file)
+        ssh.upload_file(self._create_file(join(self.host.tmp_dir, 'service'), self.vm.my_service()), self.vm.my_service_path)
+        ssh.upload_file(self._create_file(join(self.host.tmp_dir, 'script.sh'),self.vm.script_sh()), self.vm.script_path)
+
+    def _start_my_service(self, ssh: SshClient):
+        ssh.ssh_exec_commands(self.vm.start_service_commands)
+
+    def _create_vm_dirs(self, ssh: SshClient):
+        ssh.ssh_exec(f'mkdir {self.vm.tg_dir}')
+
+    def _change_vm_service_dir_access(self, ssh: SshClient):
         ssh.ssh_exec_commands([
-            f'sudo chown {self.user}:{self.user} /etc/systemd/system/',
-            'sudo chmod u+w /etc/systemd/system/'
-            ])
-        ssh.upload_file(
-            self._create_file(join(self.tmp_dir, 'myscript.service'), self._generate_my_service()),
-            '/etc/systemd/system/myscript.service'
-        )
-        ssh.upload_file(
-            self._create_file(join(self.tmp_dir, 'script.sh'), self._generate_script_sh()),
-            f'/home/{self.user}/script.sh'
-        )
+            f'sudo chown {self.vm.user}:{self.vm.user} {self.vm.services_dir}',
+            f'sudo chmod u+w {self.vm.services_dir}'
+        ])
 
-    @staticmethod
-    def _wait_execute_script(ssh):
+    def _wait_execute_script(self, ssh: SshClient):
         with console.status("[red]Waiting for execute script") as status:
-            while ssh.exec_command('systemctl is-active myscript.service') == 'active':
-                status.update(ssh.exec_command('journalctl -n 20 -u myscript.service'))
+            while ssh.exec_command(f'systemctl is-active {self.vm.my_service_name}') == 'active':
+                status.update(ssh.exec_command(f'journalctl -n 20 -u {self.vm.my_service_name}'))
                 time.sleep(0.1)
-        console.print(ssh.exec_command('journalctl -b -1 -u myscript.service'))
+        console.print(ssh.exec_command(f'journalctl -b -1 -u {self.vm.my_service_name}'))
 
-    def _download_report(self, ssh: SshClient, machine_name: str):
+    def _download_report(self, ssh: SshClient):
         try:
             ssh.download_file(
-                f'/home/{self.user}/scripts/oo_desktop_testing/reports/{self.version}_desktop_report.csv',
-                join(self.report_dir, f'{self.version}_{machine_name}_desktop_report.csv')
+                self.vm.report_path, join(self.report_dir,
+                f'{self.version}_{self.vm.name}_desktop_report.csv')
             )
         except Exception as e:
             print(f"Exceptions when download report: {e}")
-
-    def _generate_script_sh(self) -> str:
-        return f'''\
-        #!/usr/bin/bash
-        cd ~/scripts/oo_desktop_testing
-        git pull
-        source ~/scripts/oo_desktop_testing/.venv/bin/activate
-        inv desktop -v {self.version}\
-        '''
-    def _generate_my_service(self):
-        return f'''\
-        [Unit]
-        Description=CustomBashScript
-        
-        [Service]
-        Type=simple
-        ExecStart=/usr/bin/bash /home/{self.user}/script.sh
-        User={self.user}
-        
-        [Install]
-        WantedBy=multi-user.target\
-        '''
 
     @staticmethod
     def _create_file(path: str, text: str) -> str:

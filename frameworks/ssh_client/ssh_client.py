@@ -59,7 +59,7 @@ class SshClient:
                 self.client.connect(self.host, username=username)
                 self.create_ssh_chanel()
                 self.create_sftp_chanel()
-                print('[green]|INFO|Connected')
+                print(f'[green]|INFO| Connected to host: {self.host}')
                 break
 
             except paramiko.AuthenticationException:
