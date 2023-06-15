@@ -26,7 +26,7 @@ class DesktopTests:
             self.stdout = False
         for vm_name in vm_names:
             pool.apply_async(self.run_test, args=(vm_name,))
-            time.sleep(2)
+            time.sleep(3)
         pool.close()
         pool.join()
         self._merge_reports()
