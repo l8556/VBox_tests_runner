@@ -10,11 +10,13 @@ from frameworks.VBox import VirtualMachine, Vbox
 from frameworks.host_control import FileUtils
 from tests.desktop_tests import DesktopTests
 
+
 @task
-def desktop_test(c, version=None, name=None):
+def desktop_test(c, version=None, name=None, processes=None):
     version = version if version else Prompt.ask('[red]Please enter version')
     vm_names = [name] if name else FileUtils.read_json(join(os.getcwd(), 'config.json'))['hosts']
-    DesktopTests(version=version).run(Vbox().check_vm_names(vm_names))
+    num_processes = int(processes) if processes else 1
+    DesktopTests(version=version).run(Vbox().check_vm_names(vm_names), num_processes)
 
 @task
 def run_vm(c, name: str = '', headless=False):

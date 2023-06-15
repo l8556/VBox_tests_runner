@@ -1,55 +1,57 @@
 # -*- coding: utf-8 -*-
-import os.path
 import time
-
 from os.path import join
+import multiprocessing
 
 from frameworks.VBox import VirtualMachine
 from frameworks.host_control import FileUtils
 from frameworks.report import Report
 from frameworks.ssh_client.ssh_client import SshClient
-from rich.console import Console
+from rich import print
 
 from tests.data import LinuxData, HostData
 
-console = Console()
-
 class DesktopTests:
     def __init__(self, version: str):
-        self.testing_hosts = FileUtils.read_json(join(os.getcwd(), 'config.json'))['hosts']
+        self.stdout = True
         self.version = version
         self.vm = None
         self.host = HostData()
         self.report_dir = join(self.host.report_dir, self.version)
         FileUtils.create_dir((self.report_dir, self.host.tmp_dir), silence=True)
 
-    def run(self):
-        for machine_name in self.testing_hosts:
-            running_vm = self._run_vm(machine_name)
-            self.vm = self._create_vm_data(running_vm, machine_name)
-            self.run_script_on_vm()
-            running_vm.stop()
+    def run(self, vm_names: list, max_processes = 1):
+        pool = multiprocessing.Pool(max_processes)
+        self.stdout = True if max_processes == 1 else False
+        for vm_name in vm_names:
+            pool.apply_async(self.run_test, args=(vm_name,))
+            time.sleep(2)
+        pool.close()
+        pool.join()
         self._merge_reports()
-        FileUtils.delete(self.host.tmp_dir, all_from_folder=True)
+
+    def run_test(self, machine_name):
+        running_vm = self._run_vm(machine_name)
+        self.vm = self._create_vm_data(running_vm, machine_name)
+        self.run_script_on_vm()
+        running_vm.stop()
 
     def _create_vm_data(self, running_vm, machine_name):
         return LinuxData(
-            user=running_vm.get_logged_user(),
+            user=running_vm.get_logged_user(stdout=self.stdout),
             version=self.version,
             ip=running_vm.get_ip(),
             name=machine_name
         )
 
-    @staticmethod
-    def _run_vm(machine_name) -> VirtualMachine:
+    def _run_vm(self, machine_name) -> VirtualMachine:
         vm = VirtualMachine(machine_name)
         if vm.check_status():
             vm.stop()
         vm.restore_snapshot()
         vm.run(headless=True)
-        vm.wait_net_up()
+        vm.wait_net_up(stdout=self.stdout)
         return vm
-
 
     def _merge_reports(self):
         reports = FileUtils.get_paths(self.report_dir, name_include=f"{self.version}")
@@ -85,7 +87,8 @@ class DesktopTests:
         ])
 
     def _wait_execute_service(self, ssh: SshClient):
-        ssh.wait_execute_service(self.vm.my_service_name)
+        print(f"[green]|INFO| Wait executing script on vm: {self.vm.name}")
+        ssh.wait_execute_service(self.vm.my_service_name, stdout=self.stdout)
         ssh.ssh_exec(f'sudo systemctl disable {self.vm.my_service_name}')
 
     def _download_report(self, ssh: SshClient):

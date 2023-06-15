@@ -14,12 +14,13 @@ class VirtualMachine:
     def wait_boot(self):
         self._run_cmd(f"{cmd.wait} {self.name} VBoxServiceHeartbeat")
 
-    def get_logged_user(self, timeout: int = 300) -> str | None:
+    def get_logged_user(self, timeout: int = 300, stdout: bool = True) -> str | None:
         start_time = time.time()
         with console.status("[red]Waiting for Logged In Users List") as status:
             while time.time() - start_time < timeout:
                 output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/OS/LoggedInUsersList"')
-                status.update(f"[red]Waiting for Logged In Users List: {(time.time() - start_time):.02f}/{timeout}")
+                if stdout:
+                    status.update(f"[red]Waiting for Logged In Users List: {(time.time() - start_time):.02f}/{timeout}")
                 if output and output != 'No value set!':
                     console.print(f'[green]|INFO| List of logged-in users {output}')
                     if len(output.split(':')) >= 2:
@@ -31,12 +32,13 @@ class VirtualMachine:
 
 
 
-    def wait_net_up(self, timeout: int = 300):
+    def wait_net_up(self, timeout: int = 300, stdout: bool = True):
         start_time = time.time()
         with console.status("[red]Waiting for network adapter up") as status:
             while time.time() - start_time < timeout:
                 output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
-                status.update(f"[red]Waiting for network adapter up: {(time.time() - start_time):.02f}/{timeout}")
+                if stdout:
+                    status.update(f"[red]Waiting for network adapter up: {(time.time() - start_time):.02f}/{timeout}")
                 if output and output != 'No value set!':
                     return console.print(f'[green]|INFO| The network adapter is running, ip: {output}')
             raise print(
