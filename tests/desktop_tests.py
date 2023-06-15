@@ -22,7 +22,8 @@ class DesktopTests:
 
     def run(self, vm_names: list, max_processes = 1):
         pool = multiprocessing.Pool(max_processes)
-        self.stdout = True if max_processes == 1 else False
+        if max_processes == 1:
+            self.stdout = False
         for vm_name in vm_names:
             pool.apply_async(self.run_test, args=(vm_name,))
             time.sleep(2)
@@ -87,7 +88,7 @@ class DesktopTests:
         ])
 
     def _wait_execute_service(self, ssh: SshClient):
-        print(f"[green]|INFO| Wait executing script on vm: {self.vm.name}")
+        print(f"[green]|INFO|{self.vm.name}| Wait executing script on vm")
         ssh.wait_execute_service(self.vm.my_service_name, stdout=self.stdout)
         ssh.ssh_exec(f'sudo systemctl disable {self.vm.my_service_name}')
 
@@ -98,7 +99,7 @@ class DesktopTests:
                 f'{self.version}_{self.vm.name}_desktop_report.csv')
             )
         except Exception as e:
-            print(f"Exceptions when download report: {e}")
+            print(f"[red]|WARNING|{self.vm.name}| Exceptions when download report: {e}")
 
     @staticmethod
     def _create_file(path: str, text: str) -> str:
