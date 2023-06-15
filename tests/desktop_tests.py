@@ -27,7 +27,7 @@ class DesktopTests:
         FileUtils.create_dir((self.report_dir, self.host.tmp_dir), silence=True)
 
     def run_multiprocessing(self, vm_names: list, max_processes = 1):
-        with concurrent.futures.ProcessPoolExecutor(max_workers=max_processes) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_processes) as executor:
             try:
                 futures = []
                 for vm_name in vm_names:
