@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
 import time
 from os.path import join
-import multiprocessing
+
 
 from frameworks.VBox import VirtualMachine
 from frameworks.console import MyConsole
 from frameworks.host_control import FileUtils
 from frameworks.report import Report
 from frameworks.ssh_client.ssh_client import SshClient
-from rich import print
+import concurrent.futures
+
 console = MyConsole().console
 print = console.print
 
+
 from tests.data import LinuxData, HostData
+
 
 class DesktopTests:
     def __init__(self, version: str):
@@ -24,16 +27,14 @@ class DesktopTests:
         FileUtils.create_dir((self.report_dir, self.host.tmp_dir), silence=True)
 
     def run_multiprocessing(self, vm_names: list, max_processes = 1):
-        pool = multiprocessing.Pool(max_processes)
-        try:
-            for vm_name in vm_names:
-                pool.apply_async(self.desktop_test, args=(vm_name,))
-                time.sleep(2)
-        except KeyboardInterrupt:
-            print("[bold red]|WARNING| Interruption by the user")
-        finally:
-            pool.terminate()
-            pool.join()
+        with concurrent.futures.ProcessPoolExecutor(max_workers=max_processes) as executor:
+            try:
+                futures = [executor.submit(self.desktop_test, vm_name) for vm_name in vm_names]
+                concurrent.futures.wait(futures, timeout=None)
+            except KeyboardInterrupt:
+                print("[bold red]|WARNING| Interruption by the user")
+                executor.shutdown(wait=False)
+
         self._merge_reports()
 
     def run_single_process(self, machine_names: str | list):
