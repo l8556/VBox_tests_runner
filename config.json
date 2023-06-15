@@ -3,6 +3,7 @@
   "hosts": [
     "Ubuntu16",
     "Kubuntu",
-    "CentOs9"
+    "CentOs9",
+    "Debian12"
   ]
 }
