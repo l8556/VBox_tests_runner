@@ -25,11 +25,15 @@ class DesktopTests:
 
     def run_multiprocessing(self, vm_names: list, max_processes = 1):
         pool = multiprocessing.Pool(max_processes)
-        for vm_name in vm_names:
-            pool.apply_async(self.desktop_test, args=(vm_name,))
-            time.sleep(2)
-        pool.close()
-        pool.join()
+        try:
+            for vm_name in vm_names:
+                pool.apply_async(self.desktop_test, args=(vm_name,))
+                time.sleep(2)
+        except KeyboardInterrupt:
+            print("[bold red]|WARNING| Interruption by the user")
+        finally:
+            pool.terminate()
+            pool.join()
         self._merge_reports()
 
     def run_single_process(self, machine_names: str | list):
