@@ -16,33 +16,37 @@ from tests.data import LinuxData, HostData
 
 class DesktopTests:
     def __init__(self, version: str):
-        self.test_status = console.status('')
-        self.test_status.start()
+        self.test_status = None
         self.version = version
         self.vm = None
         self.host = HostData()
         self.report_dir = join(self.host.report_dir, self.version)
         FileUtils.create_dir((self.report_dir, self.host.tmp_dir), silence=True)
 
-    def run_multiprocessing_test(self, vm_names: list, max_processes = 1):
+    def run_multiprocessing(self, vm_names: list, max_processes = 1):
         pool = multiprocessing.Pool(max_processes)
-        if max_processes > 1:
-            self.test_status.stop()
         for vm_name in vm_names:
-            pool.apply_async(self.run_test, args=(vm_name,))
-            time.sleep(3)
+            pool.apply_async(self.desktop_test, args=(vm_name,))
+            time.sleep(2)
         pool.close()
         pool.join()
         self._merge_reports()
 
-    def run_test(self, machine_names: str | list):
+    def run_single_process(self, machine_names: str | list):
+        self.test_status = console.status('')
+        self.test_status.start()
         for name in machine_names if isinstance(machine_names, list) else [machine_names]:
-            running_vm = self._run_vm(name)
-            self.vm = self._create_vm_data(running_vm, name)
-            self.run_script_on_vm()
-            running_vm.stop()
+            self.desktop_test(name)
+        self.test_status.stop()
+        self._merge_reports()
 
-    def _create_vm_data(self, running_vm, machine_name):
+    def desktop_test(self, vm_name: str):
+        running_vm = self._run_vm(vm_name)
+        self.vm = self._create_data_vm(running_vm, vm_name)
+        self.run_script_on_vm()
+        running_vm.stop()
+
+    def _create_data_vm(self, running_vm, machine_name):
         return LinuxData(
             user=running_vm.get_logged_user(status=self.test_status),
             version=self.version,
