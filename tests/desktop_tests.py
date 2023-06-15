@@ -88,7 +88,7 @@ class DesktopTests:
         ])
 
     def _wait_execute_service(self, ssh: SshClient):
-        print(f"[green]|INFO|{self.vm.name}| Wait executing script on vm")
+        print(f"[red]{'-' * 90}\n|INFO|{self.vm.name}| Wait executing script on vm\n{'-' * 90}")
         ssh.wait_execute_service(self.vm.my_service_name, stdout=self.stdout)
         ssh.ssh_exec(f'sudo systemctl disable {self.vm.my_service_name}')
 
