@@ -38,11 +38,10 @@ class DesktopTests:
         self._merge_reports()
 
     def run_single_process(self, machine_names: str | list):
-        with console.status('') as status:
-            self.test_status = status
-            for name in machine_names if isinstance(machine_names, list) else [machine_names]:
-                self.desktop_test(name)
-            self._merge_reports()
+        self.test_status = console.status('')
+        for name in machine_names if isinstance(machine_names, list) else [machine_names]:
+            self.desktop_test(name)
+        self._merge_reports()
 
     def desktop_test(self, vm_name: str):
         running_vm = self._run_vm(vm_name)

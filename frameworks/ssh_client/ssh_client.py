@@ -77,19 +77,18 @@ class SshClient:
                 time.sleep(3)
                 continue
 
-    def wait_execute_service(self, service_name: str, timeout: int = None, status = None):
+    def wait_execute_service(self, service_name: str, timeout: int = None, status: console.status = None):
         start_time = time.time()
         status_msg = f"[cyan]|INFO|{self.host}| Waiting for execute {service_name}"
-        print(status_msg)
+        status.start() if status else print(status_msg)
         while self.exec_command(f'systemctl is-active {service_name}') == 'active':
             if status:
                 status.update(f"{status_msg}\n{self.exec_command(f'journalctl -n 20 -u {service_name}')}")
             time.sleep(0.2)
             if isinstance(timeout, int) and (time.time() - start_time) >= timeout:
                 print(f'[bold red]|WARNING||{self.host}| The service {service_name} waiting time has expired ')
-                console.clear()
                 break
-        console.clear()
+        status.stop() if status else ...
         print(
             f"[blue]{'-' * 90}\n|INFO|{self.host}|Service {service_name} log:\n{'-' * 90}\n\n"
             f"{self.exec_command(f'journalctl -n 1000 -u {service_name}')}\n{'-' * 90}"

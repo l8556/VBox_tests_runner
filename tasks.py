@@ -11,6 +11,7 @@ from frameworks.host_control import FileUtils
 from tests.desktop_tests import DesktopTests
 
 
+
 @task
 def desktop_test(c, version=None, name=None, processes=None):
     version = version if version else Prompt.ask('[red]Please enter version')
