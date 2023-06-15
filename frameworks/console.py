@@ -4,7 +4,6 @@ from rich.console import Console
 from frameworks.decorators import singleton
 
 
-@singleton
 class MyConsole:
     def __init__(self):
         self.console = Console()

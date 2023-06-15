@@ -9,8 +9,13 @@ from rich import print
 from frameworks.VBox import VirtualMachine, Vbox
 from frameworks.host_control import FileUtils
 from tests.desktop_tests import DesktopTests
+import signal
 
+def handle_interrupt(signum, frame):
+    print("[bold red]|WARNING| Interruption by the user")
+    raise KeyboardInterrupt
 
+signal.signal(signal.SIGINT, handle_interrupt)
 
 @task
 def desktop_test(c, version=None, name=None, processes=None):

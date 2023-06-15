@@ -32,7 +32,7 @@ class VirtualMachine:
             f"[red]|ERROR|{self.name}| Waiting time for the virtual machine {self.name} Logged In Users List has expired"
         )
 
-    def wait_net_up(self, timeout: int = 300, status: console.status = True):
+    def wait_net_up(self, timeout: int = 300, status: console.status = None):
         start_time = time.time()
         status_msg = f"[cyan]|INFO|{self.name}| Waiting for network adapter up"
         status.start() if status else print(status_msg)

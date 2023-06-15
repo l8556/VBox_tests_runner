@@ -29,19 +29,19 @@ class DesktopTests:
             try:
                 futures = []
                 for vm_name in vm_names:
-                    time.sleep(2)
                     futures.append(executor.submit(self.desktop_test, vm_name))
+                    time.sleep(10)
                 concurrent.futures.wait(futures, timeout=None)
             except KeyboardInterrupt:
                 print("[bold red]|WARNING| Interruption by the user")
                 executor.shutdown(wait=False)
-        self._merge_reports()
+        self.merge_reports()
 
     def run_single_process(self, machine_names: str | list):
         self.test_status = console.status('')
         for name in machine_names if isinstance(machine_names, list) else [machine_names]:
             self.desktop_test(name)
-        self._merge_reports()
+        self.merge_reports()
 
     def desktop_test(self, vm_name: str):
         running_vm = self._run_vm(vm_name)
@@ -66,7 +66,7 @@ class DesktopTests:
         vm.wait_net_up(status=self.test_status)
         return vm
 
-    def _merge_reports(self):
+    def merge_reports(self):
         reports = FileUtils.get_paths(self.report_dir, name_include=f"{self.version}")
         Report().merge(reports,  join(self.report_dir, f"{self.version}_full_report.csv"))
 
