@@ -4,16 +4,20 @@ from os.path import join
 import multiprocessing
 
 from frameworks.VBox import VirtualMachine
+from frameworks.console import MyConsole
 from frameworks.host_control import FileUtils
 from frameworks.report import Report
 from frameworks.ssh_client.ssh_client import SshClient
 from rich import print
+console = MyConsole().console
+print = console.print
 
 from tests.data import LinuxData, HostData
 
 class DesktopTests:
     def __init__(self, version: str):
-        self.stdout = True
+        self.test_status = console.status('')
+        self.test_status.start()
         self.version = version
         self.vm = None
         self.host = HostData()
@@ -23,7 +27,7 @@ class DesktopTests:
     def run_multiprocessing_test(self, vm_names: list, max_processes = 1):
         pool = multiprocessing.Pool(max_processes)
         if max_processes > 1:
-            self.stdout = False
+            self.test_status.stop()
         for vm_name in vm_names:
             pool.apply_async(self.run_test, args=(vm_name,))
             time.sleep(3)
@@ -40,7 +44,7 @@ class DesktopTests:
 
     def _create_vm_data(self, running_vm, machine_name):
         return LinuxData(
-            user=running_vm.get_logged_user(stdout=self.stdout),
+            user=running_vm.get_logged_user(status=self.test_status),
             version=self.version,
             ip=running_vm.get_ip(),
             name=machine_name
@@ -52,7 +56,7 @@ class DesktopTests:
             vm.stop()
         vm.restore_snapshot()
         vm.run(headless=True)
-        vm.wait_net_up(stdout=self.stdout)
+        vm.wait_net_up(status=self.test_status)
         return vm
 
     def _merge_reports(self):
@@ -90,7 +94,7 @@ class DesktopTests:
 
     def _wait_execute_service(self, ssh: SshClient):
         print(f"[red]{'-' * 90}\n|INFO|{self.vm.name}| Wait executing script on vm\n{'-' * 90}")
-        ssh.wait_execute_service(self.vm.my_service_name, stdout=self.stdout)
+        ssh.wait_execute_service(self.vm.my_service_name, status=self.test_status)
         ssh.ssh_exec(f'sudo systemctl disable {self.vm.my_service_name}')
 
     def _download_report(self, ssh: SshClient):
