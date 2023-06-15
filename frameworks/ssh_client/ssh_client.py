@@ -89,7 +89,10 @@ class SshClient:
             if isinstance(timeout, int) and (time.time() - start_time) >= timeout:
                 print(f'[bold red]|WARNING||{self.host}| The service {service_name} waiting time has expired ')
                 break
-        console.print(self.exec_command(f'journalctl -n 1000 -u {service_name}'))
+        console.print(
+            f"[blue]{'-' * 90}\n|INFO|{self.host}|Service {service_name} log:\n"
+            f"{self.exec_command(f'journalctl -n 1000 -u {service_name}')}\n{'-' * 90}"
+        )
 
     def exec_command(self, command: str) -> str | None:
         stdin, stdout, stderr = self.client.exec_command(command)
