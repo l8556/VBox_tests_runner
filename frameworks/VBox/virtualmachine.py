@@ -4,6 +4,7 @@ import time
 from .commands import Commands as cmd
 from subprocess import call, getoutput
 from ..console import MyConsole
+
 console = MyConsole().console
 print = console.print
 

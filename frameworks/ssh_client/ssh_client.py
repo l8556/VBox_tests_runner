@@ -10,7 +10,6 @@ console = MyConsole().console
 print = console.print
 
 
-
 class SshClient:
     def __init__(self, host: str):
         self.host = host
@@ -88,9 +87,11 @@ class SshClient:
             time.sleep(0.2)
             if isinstance(timeout, int) and (time.time() - start_time) >= timeout:
                 print(f'[bold red]|WARNING||{self.host}| The service {service_name} waiting time has expired ')
+                console.clear()
                 break
+        console.clear()
         print(
-            f"[blue]{'-' * 90}\n|INFO|{self.host}|Service {service_name} log:\n"
+            f"[blue]{'-' * 90}\n|INFO|{self.host}|Service {service_name} log:\n{'-' * 90}\n\n"
             f"{self.exec_command(f'journalctl -n 1000 -u {service_name}')}\n{'-' * 90}"
         )
 

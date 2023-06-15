@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import time
 from os.path import join
+import concurrent.futures
 
 
 from frameworks.VBox import VirtualMachine
@@ -8,13 +9,10 @@ from frameworks.console import MyConsole
 from frameworks.host_control import FileUtils
 from frameworks.report import Report
 from frameworks.ssh_client.ssh_client import SshClient
-import concurrent.futures
+from tests.data import LinuxData, HostData
 
 console = MyConsole().console
 print = console.print
-
-
-from tests.data import LinuxData, HostData
 
 
 class DesktopTests:
@@ -40,12 +38,11 @@ class DesktopTests:
         self._merge_reports()
 
     def run_single_process(self, machine_names: str | list):
-        self.test_status = console.status('')
-        self.test_status.start()
-        for name in machine_names if isinstance(machine_names, list) else [machine_names]:
-            self.desktop_test(name)
-        self.test_status.stop()
-        self._merge_reports()
+        with console.status('') as status:
+            self.test_status = status
+            for name in machine_names if isinstance(machine_names, list) else [machine_names]:
+                self.desktop_test(name)
+            self._merge_reports()
 
     def desktop_test(self, vm_name: str):
         running_vm = self._run_vm(vm_name)
