@@ -82,8 +82,7 @@ class SshClient:
         status_msg = f"[cyan]|INFO|{self.host}| Waiting for execute {service_name}"
         status.start() if status else print(status_msg)
         while self.exec_command(f'systemctl is-active {service_name}') == 'active':
-            if status:
-                status.update(f"{status_msg}\n{self.exec_command(f'journalctl -n 20 -u {service_name}')}")
+            status.update(f"{status_msg}\n{self.exec_command(f'journalctl -n 20 -u {service_name}')}") if status else ...
             time.sleep(0.2)
             if isinstance(timeout, int) and (time.time() - start_time) >= timeout:
                 print(f'[bold red]|WARNING||{self.host}| The service {service_name} waiting time has expired ')
@@ -132,34 +131,6 @@ class SshClient:
             while True:
                 time.sleep(0.5)
                 if ssh_channel.recv_ready():
-                     print(ssh_channel.recv(4096).decode('utf-8'))
+                    print(ssh_channel.recv(4096).decode('utf-8'))
                 if ssh_channel.exit_status_ready():
                     break
-
-    def wait_command(self):
-        while not self.ssh.exit_status_ready():
-            print(self.ssh.exit_status_ready())
-            time.sleep(0.1)
-            continue
-
-    def read_output(self):
-        while not self.ssh.recv_ready():
-            time.sleep(0.1)
-            continue
-        output = ''
-        while True:
-            if self.ssh.recv_ready():
-                output += self.ssh.recv(1024).decode()
-                command_output = '\n'.join(output.split('\n')[1:-1])
-                print(command_output)
-            else:
-                break
-
-    def test(self):
-        command = 'apt update'
-        stdin, stdout, stderr = self.client.exec_command(command)
-        exit_status = stdout.channel.recv_exit_status()
-        if exit_status == 0:
-            print('Success')
-        else:
-            print(f'Error: {exit_status}')
