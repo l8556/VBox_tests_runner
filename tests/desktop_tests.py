@@ -20,9 +20,9 @@ class DesktopTests:
         self.report_dir = join(self.host.report_dir, self.version)
         FileUtils.create_dir((self.report_dir, self.host.tmp_dir), silence=True)
 
-    def run(self, vm_names: list, max_processes = 1):
+    def run_multiprocessing_test(self, vm_names: list, max_processes = 1):
         pool = multiprocessing.Pool(max_processes)
-        if max_processes == 1:
+        if max_processes > 1:
             self.stdout = False
         for vm_name in vm_names:
             pool.apply_async(self.run_test, args=(vm_name,))
@@ -31,11 +31,12 @@ class DesktopTests:
         pool.join()
         self._merge_reports()
 
-    def run_test(self, machine_name):
-        running_vm = self._run_vm(machine_name)
-        self.vm = self._create_vm_data(running_vm, machine_name)
-        self.run_script_on_vm()
-        running_vm.stop()
+    def run_test(self, machine_names: str | list):
+        for name in machine_names if isinstance(machine_names, list) else [machine_names]:
+            running_vm = self._run_vm(name)
+            self.vm = self._create_vm_data(running_vm, name)
+            self.run_script_on_vm()
+            running_vm.stop()
 
     def _create_vm_data(self, running_vm, machine_name):
         return LinuxData(
