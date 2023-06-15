@@ -29,12 +29,14 @@ class DesktopTests:
     def run_multiprocessing(self, vm_names: list, max_processes = 1):
         with concurrent.futures.ProcessPoolExecutor(max_workers=max_processes) as executor:
             try:
-                futures = [executor.submit(self.desktop_test, vm_name) for vm_name in vm_names]
+                futures = []
+                for vm_name in vm_names:
+                    time.sleep(2)
+                    futures.append(executor.submit(self.desktop_test, vm_name))
                 concurrent.futures.wait(futures, timeout=None)
             except KeyboardInterrupt:
                 print("[bold red]|WARNING| Interruption by the user")
                 executor.shutdown(wait=False)
-
         self._merge_reports()
 
     def run_single_process(self, machine_names: str | list):
