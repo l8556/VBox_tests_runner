@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-import time
 from os.path import join
-import concurrent.futures
-
 
 from frameworks.VBox import VirtualMachine
 from frameworks.console import MyConsole
@@ -24,28 +21,7 @@ class DesktopTests:
         self.report_dir = join(self.host.report_dir, self.version)
         FileUtils.create_dir((self.report_dir, self.host.tmp_dir), silence=True)
 
-    def run_multiprocessing(self, vm_names: list, max_processes = 1):
-        with concurrent.futures.ThreadPoolExecutor(max_workers=max_processes) as executor:
-            try:
-                futures = []
-                for vm_name in vm_names:
-                    futures.append(executor.submit(self.desktop_test, vm_name))
-                    time.sleep(10)
-                done, not_done = concurrent.futures.wait(futures, return_when=concurrent.futures.FIRST_EXCEPTION)
-                for future in done:
-                    if future.exception():
-                        print(
-                            f"[bold red]{'-'*90}\n|ERROR|Exceptions When execute the process:"
-                            f"{future.exception()}\n{'-'*90}\n\n"
-                        )
-                for future in not_done:
-                    future.cancel()
-            except KeyboardInterrupt:
-                print("[bold red]|WARNING| Interruption by the user")
-                executor.shutdown(wait=False, cancel_futures=True)
-        self.merge_reports()
-
-    def run_single_process(self, machine_names: str | list):
+    def run(self, machine_names: str | list):
         self.test_status = console.status('')
         for name in machine_names if isinstance(machine_names, list) else [machine_names]:
             self.desktop_test(name)

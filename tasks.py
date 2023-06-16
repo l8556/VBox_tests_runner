@@ -9,13 +9,8 @@ from rich import print
 from frameworks.VBox import VirtualMachine, Vbox
 from frameworks.host_control import FileUtils
 from tests.desktop_tests import DesktopTests
-import signal
+import tests.multiprocessing as multiprocess
 
-def handle_interrupt(signum, frame):
-    print("[bold red]|WARNING| Interruption by the user")
-    raise KeyboardInterrupt
-
-signal.signal(signal.SIGINT, handle_interrupt)
 
 @task
 def desktop_test(c, version=None, name=None, processes=None):
@@ -23,8 +18,10 @@ def desktop_test(c, version=None, name=None, processes=None):
     vm_names = [name] if name else FileUtils.read_json(join(os.getcwd(), 'config.json'))['hosts']
     num_processes = int(processes) if processes else 1
     if num_processes > 1:
-        return DesktopTests(version=version).run_multiprocessing(Vbox().check_vm_names(vm_names), num_processes)
-    DesktopTests(version=version).run_single_process(Vbox().check_vm_names(vm_names))
+        multiprocess.run(version, Vbox().check_vm_names(vm_names), num_processes, 10)
+        DesktopTests(version=version).merge_reports()
+        return
+    DesktopTests(version=version).run(Vbox().check_vm_names(vm_names))
 
 @task
 def run_vm(c, name: str = '', headless=False):
@@ -44,3 +41,8 @@ def vm_list(c):
 @task
 def out_info(c, name: str = ''):
     VirtualMachine(Vbox().check_vm_names(name)).out_info()
+
+
+def _run_test(version):
+    test = DesktopTests(version=version)
+    test.desktop_test()
