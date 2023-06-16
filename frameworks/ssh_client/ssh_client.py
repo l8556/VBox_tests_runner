@@ -122,8 +122,8 @@ class SshClient:
             return
         print(f"[red]|WARNING|{self.host}| SSH Chanel not created")
 
-    def ssh_exec_commands(self, commands: list):
-        for command in commands:
+    def ssh_exec_commands(self, commands: list | str):
+        for command in commands if isinstance(commands, list) else [commands]:
             ssh_channel = self.client.get_transport().open_session()
             print(f"[green]|INFO|{self.host}| Exec command: {command}")
             ssh_channel.exec_command(command)

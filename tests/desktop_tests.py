@@ -52,10 +52,10 @@ class DesktopTests:
         self.merge_reports()
 
     def desktop_test(self, vm_name: str):
-        running_vm = self._run_vm(vm_name)
-        self.vm = self._create_data_vm(running_vm, vm_name)
+        vm = VirtualMachine(vm_name)
+        self.vm = self._create_data_vm(self._run_vm(vm), vm_name)
         self.run_script_on_vm()
-        running_vm.stop()
+        vm.stop()
 
     def _create_data_vm(self, running_vm, machine_name):
         return LinuxData(
@@ -65,8 +65,7 @@ class DesktopTests:
             name=machine_name
         )
 
-    def _run_vm(self, machine_name) -> VirtualMachine:
-        vm = VirtualMachine(machine_name)
+    def _run_vm(self, vm: VirtualMachine) -> VirtualMachine:
         if vm.check_status():
             vm.stop()
         vm.restore_snapshot()
@@ -95,11 +94,11 @@ class DesktopTests:
         ssh.upload_file(self._create_file(join(self.host.tmp_dir, 'script.sh'),self.vm.script_sh()), self.vm.script_path)
 
     def _start_my_service(self, ssh: SshClient):
-        ssh.ssh_exec(f"sudo rm /var/log/journal/*/*.journal")  # clean journal
+        ssh.ssh_exec_commands(f"sudo rm /var/log/journal/*/*.journal")  # clean journal
         ssh.ssh_exec_commands(self.vm.start_service_commands)
 
     def _create_vm_dirs(self, ssh: SshClient):
-        ssh.ssh_exec(f'mkdir {self.vm.tg_dir}')
+        ssh.ssh_exec_commands(f'mkdir {self.vm.tg_dir}')
 
     def _change_vm_service_dir_access(self, ssh: SshClient):
         ssh.ssh_exec_commands([
@@ -110,7 +109,7 @@ class DesktopTests:
     def _wait_execute_service(self, ssh: SshClient):
         print(f"[red]{'-' * 90}\n|INFO|{self.vm.name}| Wait executing script on vm\n{'-' * 90}")
         ssh.wait_execute_service(self.vm.my_service_name, status=self.test_status)
-        ssh.ssh_exec(f'sudo systemctl disable {self.vm.my_service_name}')
+        ssh.ssh_exec_commands(f'sudo systemctl disable {self.vm.my_service_name}')
 
     def _download_report(self, ssh: SshClient):
         try:
