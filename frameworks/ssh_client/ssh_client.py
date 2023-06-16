@@ -37,7 +37,7 @@ class SshClient:
                 if remote_file_size == local_file_size:
                     break
         else:
-            print(f'[red]|WARNING|{self.host}| Sftp chanel not created.')
+            raise print(f'[red]|WARNING|{self.host}| Sftp chanel not created.')
 
     def download_file(self, remote, local):
         if self.sftp:
@@ -47,7 +47,7 @@ class SshClient:
                 while local_file.tell() < remote_file_size:
                     time.sleep(0.2)
         else:
-            print(f'[red]|WARNING|{self.host}| Sftp chanel not created.')
+            raise print(f'[red]|WARNING|{self.host}| Sftp chanel not created.')
 
     def create_sftp_chanel(self):
         self.sftp = self.client.open_sftp()
@@ -85,8 +85,7 @@ class SshClient:
             status.update(f"{status_msg}\n{self.exec_command(f'journalctl -n 20 -u {service_name}')}") if status else ...
             time.sleep(0.2)
             if isinstance(timeout, int) and (time.time() - start_time) >= timeout:
-                print(f'[bold red]|WARNING||{self.host}| The service {service_name} waiting time has expired ')
-                break
+                raise print(f'[bold red]|WARNING|{self.host}| The service {service_name} waiting time has expired ')
         status.stop() if status else ...
         print(
             f"[blue]{'-' * 90}\n|INFO|{self.host}|Service {service_name} log:\n{'-' * 90}\n\n"

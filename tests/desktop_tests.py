@@ -31,10 +31,18 @@ class DesktopTests:
                 for vm_name in vm_names:
                     futures.append(executor.submit(self.desktop_test, vm_name))
                     time.sleep(10)
-                concurrent.futures.wait(futures, timeout=None)
+                done, not_done = concurrent.futures.wait(futures, return_when=concurrent.futures.FIRST_EXCEPTION)
+                for future in done:
+                    if future.exception():
+                        print(
+                            f"[bold red]{'-'*90}\n|ERROR|Exceptions When execute the process:"
+                            f"{future.exception()}\n{'-'*90}\n\n"
+                        )
+                for future in not_done:
+                    future.cancel()
             except KeyboardInterrupt:
                 print("[bold red]|WARNING| Interruption by the user")
-                executor.shutdown(wait=False)
+                executor.shutdown(wait=False, cancel_futures=True)
         self.merge_reports()
 
     def run_single_process(self, machine_names: str | list):
