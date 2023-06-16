@@ -78,7 +78,7 @@ class DesktopTests:
         Report().merge(reports,  join(self.report_dir, f"{self.version}_full_report.csv"))
 
     def run_script_on_vm(self):
-        ssh = SshClient(self.vm.ip)
+        ssh = SshClient(self.vm.ip, self.vm.name)
         ssh.connect(self.vm.user)
         self._create_vm_dirs(ssh)
         self._change_vm_service_dir_access(ssh)

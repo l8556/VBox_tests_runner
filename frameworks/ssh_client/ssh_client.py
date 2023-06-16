@@ -11,7 +11,8 @@ print = console.print
 
 
 class SshClient:
-    def __init__(self, host: str):
+    def __init__(self, host: str, host_name: str = None):
+        self.host_name = host_name if host_name else ''
         self.host = host
         self.client = SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -29,7 +30,7 @@ class SshClient:
 
     def upload_file(self, local, remote):
         if self.sftp:
-            print(f'[green]|INFO|{self.host}| Upload file: {basename(local)} to {remote}')
+            print(f'[green]|INFO|{self.host_name}|{self.host}| Upload file: {basename(local)} to {remote}')
             self.sftp.putfo(open(local, 'rb'), remote)
             local_file_size = os.stat(local).st_size
             while True:
@@ -37,7 +38,7 @@ class SshClient:
                 if remote_file_size == local_file_size:
                     break
         else:
-            raise print(f'[red]|WARNING|{self.host}| Sftp chanel not created.')
+            raise print(f'[red]|WARNING|{self.host_name}|{self.host}| Sftp chanel not created.')
 
     def download_file(self, remote, local):
         if self.sftp:
@@ -47,13 +48,13 @@ class SshClient:
                 while local_file.tell() < remote_file_size:
                     time.sleep(0.2)
         else:
-            raise print(f'[red]|WARNING|{self.host}| Sftp chanel not created.')
+            raise print(f'[red]|WARNING|{self.host_name}|{self.host}| Sftp chanel not created.')
 
     def create_sftp_chanel(self):
         self.sftp = self.client.open_sftp()
 
     def connect(self, username: str, timeout: int = 300):
-        print(f"[green]|INFO|{self.host}| Connect to host.")
+        print(f"[green]|INFO|{self.host_name}|{self.host}| Connect to host.")
         start_time = time.time()
         while time.time() - start_time < timeout:
             try:
@@ -61,34 +62,34 @@ class SshClient:
                 self.client.connect(self.host, username=username)
                 self.create_ssh_chanel()
                 self.create_sftp_chanel()
-                print(f'[green]|INFO|{self.host}| Connected.')
+                print(f'[green]|INFO|{self.host_name}|{self.host}| Connected.')
                 break
 
             except paramiko.AuthenticationException:
-                print(f'[red]|ERROR|{self.host}| Authentication failed. Waiting and retrying...')
+                print(f'[red]|ERROR|{self.host_name}|{self.host}| Authentication failed. Waiting and retrying...')
                 time.sleep(3)
                 continue
             except paramiko.SSHException as e:
-                print(f'[red]|ERROR|{self.host}| SSH error: {e}. Waiting and retrying...')
+                print(f'[red]|ERROR|{self.host_name}|{self.host}| SSH error: {e}. Waiting and retrying...')
                 time.sleep(3)
                 continue
             except Exception as e:
-                print(f"[red]|ERROR|{self.host}| Failed to connect: {username}@{self.host}.\nWaiting and retrying...")
+                print(f"[red]|ERROR|{self.host_name}|{self.host}| Failed to connect: {username}@{self.host}.\nWaiting and retrying...")
                 time.sleep(3)
                 continue
 
     def wait_execute_service(self, service_name: str, timeout: int = None, status: console.status = None):
         start_time = time.time()
-        status_msg = f"[cyan]|INFO|{self.host}| Waiting for execute {service_name}"
+        status_msg = f"[cyan]|INFO|{self.host_name}|{self.host}| Waiting for execute {service_name}"
         status.start() if status else print(status_msg)
         while self.exec_command(f'systemctl is-active {service_name}') == 'active':
             status.update(f"{status_msg}\n{self.exec_command(f'journalctl -n 20 -u {service_name}')}") if status else ...
             time.sleep(0.2)
             if isinstance(timeout, int) and (time.time() - start_time) >= timeout:
-                raise print(f'[bold red]|WARNING|{self.host}| The service {service_name} waiting time has expired ')
+                raise print(f'[bold red]|WARNING|{self.host_name}|{self.host}| The service {service_name} waiting time has expired ')
         status.stop() if status else ...
         print(
-            f"[blue]{'-' * 90}\n|INFO|{self.host}|Service {service_name} log:\n{'-' * 90}\n\n"
+            f"[blue]{'-' * 90}\n|INFO|{self.host_name}|{self.host}|Service {service_name} log:\n{'-' * 90}\n\n"
             f"{self.exec_command(f'journalctl -n 1000 -u {service_name}')}\n{'-' * 90}"
         )
 
@@ -114,13 +115,13 @@ class SshClient:
 
     def ssh_exec(self, command):
         if self.ssh is not None:
-            print(f"[green]|INFO|{self.host}| Exec command: {command}")
+            print(f"[green]|INFO|{self.host_name}|{self.host}| Exec command: {command}")
             self.ssh.send(f'{command}\n')
             time.sleep(1)
             while not self.ssh.recv_ready():
                 time.sleep(0.5)
             return
-        print(f"[red]|WARNING|{self.host}| SSH Chanel not created")
+        print(f"[red]|WARNING|{self.host_name}|{self.host}| SSH Chanel not created")
 
     def ssh_exec_commands(self, commands: list | str):
         for command in commands if isinstance(commands, list) else [commands]:
