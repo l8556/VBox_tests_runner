@@ -50,7 +50,7 @@ class DesktopTests:
         return vm
 
     def merge_reports(self):
-        reports = FileUtils.get_paths(self.report_dir, name_include=f"{self.version}")
+        reports = FileUtils.get_paths(self.report_dir, name_include=f"{self.version}", extension='csv')
         Report().merge(reports,  join(self.report_dir, f"{self.version}_full_report.csv"))
 
     def run_script_on_vm(self):
@@ -88,11 +88,11 @@ class DesktopTests:
         ssh.ssh_exec_commands(f'sudo systemctl disable {self.vm.my_service_name}')
 
     def _download_report(self, ssh: SshClient):
+        print('download')
+        host_report_dir = join(self.host.report_dir, self.version, self.vm.name)
+        FileUtils.create_dir(host_report_dir)
         try:
-            ssh.download_file(
-                self.vm.report_path, join(self.report_dir,
-                f'{self.version}_{self.vm.name}_desktop_report.csv')
-            )
+            ssh.download_dir(self.vm.report_path, host_report_dir)
         except Exception as e:
             print(f"[red]|WARNING|{self.vm.name}| Exceptions when download report: {e}")
 

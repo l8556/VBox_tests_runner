@@ -19,7 +19,13 @@ class Report:
 
     def merge(self, reports: list, result_csv_path: str, delimiter='\t') -> str | None:
         if reports:
-            df = pd.concat([self.read(csv_, delimiter) for csv_ in reports if isfile(csv_)], ignore_index=True)
+            merge_reports = []
+            for csv_ in reports:
+                if isfile(csv_):
+                    report = self.read(csv_, delimiter)
+                    if report is not None:
+                        merge_reports.append(report)
+            df = pd.concat(merge_reports, ignore_index=True)
             df.to_csv(result_csv_path, index=False, sep=delimiter)
             return result_csv_path
         print('[green]|INFO| No files to merge')
@@ -32,9 +38,12 @@ class Report:
             writer.writerow(message)
 
     @staticmethod
-    def read(csv_file: str, delimiter="\t") -> pd.DataFrame:
+    def read(csv_file: str, delimiter="\t") -> pd.DataFrame | None:
         try:
             return pd.read_csv(csv_file, delimiter=delimiter)
+        except pd.errors.EmptyDataError:
+            print(f"[red]|WARNING| Report: {csv_file} is empty.")
+            return None
         except Exception as e:
             Telegram().send_message(f'Exception when opening report.csv: {csv_file}\nException: {e}\nTry skip bad lines')
             return pd.read_csv(csv_file, delimiter=delimiter, on_bad_lines='skip')

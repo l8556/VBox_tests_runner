@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import time
-from os.path import basename
+from os.path import basename, join
 import paramiko
 from paramiko.client import SSHClient
 from frameworks.console import MyConsole
@@ -39,6 +39,18 @@ class SshClient:
                     break
         else:
             raise print(f'[red]|WARNING|{self.host_name}|{self.host}| Sftp chanel not created.')
+
+    def download_dir(self, remote, local):
+        if self.sftp:
+            for entry in self.sftp.listdir_attr(remote):
+                remote_filename = join(remote, entry.filename).replace('\\', '/')
+                local_filename = join(local, entry.filename)
+                print(remote_filename, local_filename)
+                if entry.st_mode & 0o170000 == 0o040000:
+                    os.makedirs(local_filename, exist_ok=True)
+                    self.download_dir(remote_filename, local_filename)
+                else:
+                    self.download_file(remote_filename, local_filename)
 
     def download_file(self, remote, local):
         if self.sftp:

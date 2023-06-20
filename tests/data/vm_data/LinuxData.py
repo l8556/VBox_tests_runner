@@ -15,7 +15,7 @@ class LinuxData(VmData):
         self.script_dir = f"{self.home_dir}/scripts"
         self.desktop_testing_path = f"{self.script_dir}/{splitext(basename(self.desktop_testing_url))[0]}"
         self.venv_path = f"{self.desktop_testing_path}/.venv/bin/activate"
-        self.report_path = f'{self.desktop_testing_path}/reports/{self.version}_desktop_report.csv'
+        self.report_path = f'{self.desktop_testing_path}/reports/{self.version}'
         self.tg_dir = f"{self.home_dir}/.telegram"
         self.tg_token_file = f"{self.tg_dir}/token"
         self.tg_chat_id_file = f"{self.tg_dir}/chat"
@@ -49,7 +49,7 @@ class LinuxData(VmData):
         return f'''\
         #!/bin/bash
         cd {self.script_dir}
-        git clone {self.desktop_testing_url}
+        git clone {'-b ' if self.branch else ''}{self.branch if self.branch else ''} {self.desktop_testing_url}
         cd {self.desktop_testing_path}
         python3 -m venv .venv
         source ./.venv/bin/activate
