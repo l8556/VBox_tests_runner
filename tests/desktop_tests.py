@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import time
 from os.path import join
 
 from frameworks.VBox import VirtualMachine
@@ -30,6 +31,7 @@ class DesktopTests:
     def desktop_test(self, vm_name: str):
         vm = VirtualMachine(vm_name)
         self.vm = self._create_data_vm(self._run_vm(vm), vm_name)
+        time.sleep(20)
         self.run_script_on_vm()
         vm.stop()
 
@@ -88,7 +90,7 @@ class DesktopTests:
         ssh.ssh_exec_commands(f'sudo systemctl disable {self.vm.my_service_name}')
 
     def _download_report(self, ssh: SshClient):
-        print('download')
+        print(f'[green]|INFO|Download reports dir: {self.vm.report_path}')
         host_report_dir = join(self.host.report_dir, self.version, self.vm.name)
         FileUtils.create_dir(host_report_dir)
         try:
