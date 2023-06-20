@@ -54,5 +54,5 @@ class LinuxData(VmData):
         python3 -m venv .venv
         source ./.venv/bin/activate
         pip install -r requirements.txt
-        invoke desktop -v {self.version}\
+        invoke desktop-test -v {self.version}\
         '''
