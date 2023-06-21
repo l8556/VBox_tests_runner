@@ -92,7 +92,7 @@ class DesktopTests:
     def _download_report(self, ssh: SshClient):
         print(f'[green]|INFO|Download reports dir: {self.vm.report_path}')
         host_report_dir = join(self.host.report_dir, self.version, self.vm.name)
-        FileUtils.create_dir(host_report_dir)
+        FileUtils.create_dir(host_report_dir, silence=True)
         try:
             ssh.download_dir(self.vm.report_path, host_report_dir)
         except Exception as e:

@@ -1,5 +1,6 @@
 from .commands import Commands as cmd
 from subprocess import getoutput
+from rich import print
 
 class Vbox:
     @staticmethod

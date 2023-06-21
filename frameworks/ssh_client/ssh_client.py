@@ -45,7 +45,6 @@ class SshClient:
             for entry in self.sftp.listdir_attr(remote):
                 remote_filename = join(remote, entry.filename).replace('\\', '/')
                 local_filename = join(local, entry.filename)
-                print(remote_filename, local_filename)
                 if entry.st_mode & 0o170000 == 0o040000:
                     os.makedirs(local_filename, exist_ok=True)
                     self.download_dir(remote_filename, local_filename)
