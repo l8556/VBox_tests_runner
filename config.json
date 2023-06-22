@@ -1,6 +1,6 @@
 {
   "desktop_script": "https://github.com/l8556/oo_desktop_testing.git",
-  "branch": "feature/improved_error_handling",
+  "branch": "",
   "hosts": [
     "RedOs7.3",
     "Ubuntu16",
