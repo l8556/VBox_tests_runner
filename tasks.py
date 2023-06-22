@@ -5,11 +5,13 @@ from os.path import join
 from invoke import task
 from rich.prompt import Prompt
 from rich import print
-
 from frameworks.VBox import VirtualMachine, Vbox
 from frameworks.host_control import FileUtils
 from tests.desktop_tests import DesktopTests
 import tests.multiprocessing as multiprocess
+from frameworks.console import MyConsole
+console = MyConsole().console
+print = console.print
 
 
 @task
@@ -27,7 +29,7 @@ def desktop_test(c, version=None, name=None, processes=None):
 def run_vm(c, name: str = '', headless=False):
     vm = VirtualMachine(Vbox().check_vm_names(name))
     vm.run(headless=headless)
-    vm.wait_net_up()
+    vm.wait_net_up(status=console.status(''))
     return print(vm.get_ip()), print(vm.get_logged_user())
 
 @task

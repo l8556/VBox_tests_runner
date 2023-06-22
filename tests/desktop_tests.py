@@ -31,13 +31,12 @@ class DesktopTests:
     def desktop_test(self, vm_name: str):
         vm = VirtualMachine(vm_name)
         self.vm = self._create_data_vm(self._run_vm(vm), vm_name)
-        time.sleep(20)
         self.run_script_on_vm()
         vm.stop()
 
     def _create_data_vm(self, running_vm, machine_name):
         return LinuxData(
-            user=running_vm.get_logged_user(status=self.test_status),
+            user=running_vm.get_logged_user(status=self.test_status, timeout=600),
             version=self.version,
             ip=running_vm.get_ip(),
             name=machine_name
@@ -48,7 +47,7 @@ class DesktopTests:
             vm.stop()
         vm.restore_snapshot()
         vm.run(headless=True)
-        vm.wait_net_up(status=self.test_status)
+        vm.wait_net_up(status=self.test_status, timeout=600)
         return vm
 
     def merge_reports(self):
