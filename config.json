@@ -4,7 +4,7 @@
   "hosts": [
     "RedOs7.3",
     "Ubuntu16",
-    "Kubuntu",
+    "Ubuntu22",
     "CentOs9",
     "Debian12"
   ]
