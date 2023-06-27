@@ -1,7 +1,8 @@
 {
   "desktop_script": "https://github.com/l8556/desktop_editor_testing.git",
-  "branch": "",
+  "branch": "opensuse",
   "hosts": [
+    "OpenSUSE15",
     "RedOs7.3",
     "Ubuntu16",
     "Ubuntu22",

@@ -7,6 +7,7 @@ from frameworks.console import MyConsole
 from frameworks.host_control import FileUtils
 from frameworks.report import Report
 from frameworks.ssh_client.ssh_client import SshClient
+from frameworks.telegram import Telegram
 from tests.data import LinuxData, HostData
 
 console = MyConsole().console
@@ -26,7 +27,8 @@ class DesktopTests:
         self.test_status = console.status('')
         for name in machine_names if isinstance(machine_names, list) else [machine_names]:
             self.desktop_test(name)
-        self.merge_reports()
+        msg = f"Full testing of Desktop Editors Completed on version: {self.version}"
+        Telegram().send_document(self.merge_reports(), caption=msg)
 
     def desktop_test(self, vm_name: str):
         vm = VirtualMachine(vm_name)
@@ -51,8 +53,10 @@ class DesktopTests:
         return vm
 
     def merge_reports(self):
+        full_report = join(self.report_dir, f"{self.version}_full_report.csv")
         reports = FileUtils.get_paths(self.report_dir, name_include=f"{self.version}", extension='csv')
-        Report().merge(reports,  join(self.report_dir, f"{self.version}_full_report.csv"))
+        Report().merge(reports, full_report)
+        return full_report
 
     def run_script_on_vm(self):
         ssh = SshClient(self.vm.ip, self.vm.name)

@@ -7,6 +7,7 @@ from rich.prompt import Prompt
 from rich import print
 from frameworks.VBox import VirtualMachine, Vbox
 from frameworks.host_control import FileUtils
+from frameworks.telegram import Telegram
 from tests.desktop_tests import DesktopTests
 import tests.multiprocessing as multiprocess
 from frameworks.console import MyConsole
@@ -21,7 +22,8 @@ def desktop_test(c, version=None, name=None, processes=None):
     num_processes = int(processes) if processes else 1
     if num_processes > 1:
         multiprocess.run(version, Vbox().check_vm_names(vm_names), num_processes, 10)
-        DesktopTests(version=version).merge_reports()
+        msg = f"Full testing of Desktop Editors Completed on version: {version}"
+        Telegram().send_document(DesktopTests(version=version).merge_reports(), caption=msg)
         return
     DesktopTests(version=version).run(Vbox().check_vm_names(vm_names))
 

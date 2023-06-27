@@ -3,6 +3,7 @@ import time
 import concurrent.futures
 import signal
 
+from frameworks.telegram import Telegram
 from tests.desktop_tests import DesktopTests
 
 
