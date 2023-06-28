@@ -23,12 +23,12 @@ class DesktopTests:
         self.report_dir = join(self.host.report_dir, self.version)
         FileUtils.create_dir((self.report_dir, self.host.tmp_dir), silence=True)
 
-    def run(self, machine_names: str | list):
+    def run(self, machine_names: str | list, tg_msg: str = None):
         self.test_status = console.status('')
         for name in machine_names if isinstance(machine_names, list) else [machine_names]:
             self.desktop_test(name)
-        msg = f"Full testing of Desktop Editors Completed on version: {self.version}"
-        Telegram().send_document(self.merge_reports(), caption=msg)
+        if tg_msg:
+            Telegram().send_document(self.merge_reports(), caption=tg_msg)
 
     def desktop_test(self, vm_name: str):
         vm = VirtualMachine(vm_name)

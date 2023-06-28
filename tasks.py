@@ -20,12 +20,12 @@ def desktop_test(c, version=None, name=None, processes=None):
     version = version if version else Prompt.ask('[red]Please enter version')
     vm_names = [name] if name else FileUtils.read_json(join(os.getcwd(), 'config.json'))['hosts']
     num_processes = int(processes) if processes else 1
+    msg = f"Full testing of Desktop Editors Completed on version: {version}"
     if num_processes > 1:
         multiprocess.run(version, Vbox().check_vm_names(vm_names), num_processes, 10)
-        msg = f"Full testing of Desktop Editors Completed on version: {version}"
         Telegram().send_document(DesktopTests(version=version).merge_reports(), caption=msg)
         return
-    DesktopTests(version=version).run(Vbox().check_vm_names(vm_names))
+    DesktopTests(version=version).run(Vbox().check_vm_names(vm_names), tg_msg=msg if not name else None)
 
 @task
 def run_vm(c, name: str = '', headless=False):
