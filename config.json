@@ -2,11 +2,12 @@
   "desktop_script": "https://github.com/l8556/desktop_editor_testing.git",
   "branch": "",
   "hosts": [
-    "OpenSUSE15",
     "RedOs7.3",
     "Ubuntu16",
     "Ubuntu22",
     "CentOs9",
-    "Debian12"
+    "Debian12",
+    "Fedora37",
+    "Kubuntu22"
   ]
 }
