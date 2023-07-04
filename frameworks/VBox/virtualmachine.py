@@ -21,13 +21,14 @@ class VirtualMachine:
         status.start() if status else print(status_msg)
         while time.time() - start_time < timeout:
             output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/OS/LoggedInUsersList"')
-            status.update(f"{status_msg}: {(time.time() - start_time):.02f}/{timeout}") if status else ...
+            status.update(f"{status_msg}: {(time.time() - start_time):.00f}/{timeout}") if status else ...
             if output and output != 'No value set!':
                 status.stop() if status else ...
                 print(f'[green]|INFO|{self.name}| List of logged-in users {output}')
                 if len(output.split(':')) >= 2:
                     return output.split(':')[1].strip()
                 raise print(f"[red]|ERROR|{self.name}| Cant get logged-in users output: {output}")
+            time.sleep(1)
         raise print(
             f"[red]|ERROR|{self.name}| Waiting time for the virtual machine {self.name} Logged In Users List has expired"
         )
@@ -38,10 +39,11 @@ class VirtualMachine:
         status.start() if status else print(status_msg)
         while time.time() - start_time < timeout:
             output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
-            status.update(f"{status_msg}: {(time.time() - start_time):.02f}/{timeout}") if status else ...
+            status.update(f"{status_msg}: {(time.time() - start_time):.00f}/{timeout}") if status else ...
             if output and output != 'No value set!':
                 status.stop() if status else ...
                 return print(f'[green]|INFO|{self.name}| The network adapter is running, ip: {output}')
+            time.sleep(1)
         raise print(
             f"[red]|ERROR|{self.name}| Waiting time for the virtual machine network adapter to start has expired"
         )
