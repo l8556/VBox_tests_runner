@@ -22,7 +22,6 @@ class Telegram:
         self.chat_id_path = chat_id_path if chat_id_path else  join(self.tg_dir, 'chat')
         self._telegram_token = self._get_token()
         self._chat_id = self._get_chat_id()
-        print()
         self.tmp_dir = tmp_dir
         FileUtils.create_dir(self.tmp_dir, silence=True)
 
