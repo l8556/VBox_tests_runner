@@ -11,24 +11,28 @@ from frameworks.host_control import FileUtils
 
 @singleton
 class Telegram:
-    def __init__(self, tmp_dir: str = './tmp'):
+    def __init__(
+            self,
+            token_path: str = None,
+            chat_id_path:str = None,
+            tmp_dir: str = './tmp'
+    ):
+        self.tg_dir = join(expanduser('~'), '.telegram')
+        self.token_path = token_path if token_path else join(self.tg_dir, 'token')
+        self.chat_id_path = chat_id_path if chat_id_path else  join(self.tg_dir, 'chat')
         self._telegram_token = self._get_token()
         self._chat_id = self._get_chat_id()
         self.tmp_dir = tmp_dir
-        FileUtils.create_dir(self.tmp_dir)
+        FileUtils.create_dir(self.tmp_dir, silence=True)
 
-    @staticmethod
-    def _get_token():
-        path = join(expanduser('~'), '.telegram', 'token')
-        if isfile(path):
-            return FileUtils.file_reader(path).strip()
+    def _get_token(self):
+        if isfile(self.chat_id_path):
+            return FileUtils.file_reader(self.chat_id_path).strip()
         print(f"[cyan]|INFO|Telegram token not exists.")
 
-    @staticmethod
-    def _get_chat_id():
-        path = join(expanduser('~'), '.telegram', 'chat')
-        if isfile(path):
-            return FileUtils.file_reader(path).strip()
+    def _get_chat_id(self):
+        if isfile(self.token_path):
+            return FileUtils.file_reader(self.token_path).strip()
         print(f"[cyan]|INFO|Telegram chat id not exists.")
 
     def send_message(self, message: str, out_msg=False) -> None:

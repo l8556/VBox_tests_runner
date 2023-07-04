@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import time
 from os.path import join
 
 from frameworks.VBox import VirtualMachine
@@ -16,10 +15,11 @@ print = console.print
 
 class DesktopTests:
     def __init__(self, version: str):
+        self.host = HostData()
+        self.tg = Telegram(token_path=self.host.tg_token, chat_id_path=self.host.tg_chat_id, tmp_dir=self.host.tmp_dir)
         self.test_status = None
         self.version = version
         self.vm = None
-        self.host = HostData()
         self.report_dir = join(self.host.report_dir, self.version)
         FileUtils.create_dir((self.report_dir, self.host.tmp_dir), silence=True)
 
@@ -28,7 +28,7 @@ class DesktopTests:
         for name in machine_names if isinstance(machine_names, list) else [machine_names]:
             self.desktop_test(name)
         if tg_msg:
-            Telegram().send_document(self.merge_reports(), caption=tg_msg)
+            self.tg.send_document(self.merge_reports(), caption=tg_msg)
 
     def desktop_test(self, vm_name: str):
         vm = VirtualMachine(vm_name)
