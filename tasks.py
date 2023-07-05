@@ -25,7 +25,8 @@ def desktop_test(c, version=None, name=None, processes=None):
         multiprocess.run(version, Vbox().check_vm_names(vm_names), num_processes, 10)
         Telegram().send_document(DesktopTests(version=version).merge_reports(), caption=msg)
         return
-    DesktopTests(version=version).run(Vbox().check_vm_names(vm_names), tg_msg=msg if not name else None)
+    for vm in Vbox().check_vm_names(vm_names):
+        DesktopTests(version=version, vm_name=vm, status=console.status('')).run(tg_msg=msg if not name else None)
 
 @task
 def run_vm(c, name: str = '', headless=False):

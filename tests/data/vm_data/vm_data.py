@@ -3,11 +3,13 @@ import os
 from dataclasses import dataclass
 from os.path import join
 
+from frameworks.VBox import VirtualMachine
 from frameworks.host_control import FileUtils
 
 
 @dataclass
 class VmData:
+    vm_process: VirtualMachine
     user: str
     ip: str
     name: str

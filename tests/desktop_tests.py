@@ -2,6 +2,7 @@
 from os.path import join, isfile
 
 from frameworks.VBox import VirtualMachine
+from frameworks.VBox.virtualmachine import VirtualMachinException
 from frameworks.console import MyConsole
 from frameworks.host_control import FileUtils
 from frameworks.report import Report
@@ -15,42 +16,35 @@ print = console.print
 
 
 class DesktopTests:
-    def __init__(self, version: str):
-        self.host = HostData()
-        self.tg = Telegram(token_path=self.host.tg_token, chat_id_path=self.host.tg_chat_id, tmp_dir=self.host.tmp_dir)
-        self.test_status = None
+    def __init__(self, version: str, vm_name: str, status = None):
         self.version = version
-        self.vm = None
+        self.vm_name = vm_name
+        self.host = HostData()
+        self.report = DesktopReport(version, join(self.host.report_dir, self.version, self.vm_name))
+        self.tg = Telegram(token_path=self.host.tg_token, chat_id_path=self.host.tg_chat_id, tmp_dir=self.host.tmp_dir)
+        self.test_status = status if status else None
         self.report_dir = join(self.host.report_dir, self.version)
         FileUtils.create_dir((self.report_dir, self.host.tmp_dir), silence=True)
+        self.vm = None
 
-    def run(self, machine_names: str | list, tg_msg: str = None):
-        self.test_status = console.status('')
-        for name in machine_names if isinstance(machine_names, list) else [machine_names]:
-            self.desktop_test(name)
-        if tg_msg:
-            self.tg.send_document(self.merge_reports(), caption=tg_msg)
+    def run(self, tg_msg: str = None):
+        self.vm = self._create_vm(self.vm_name)
+        self.run_script_on_vm()
+        self.vm.vm_process.stop()
+        self.tg.send_document(self.merge_reports(), caption=tg_msg) if tg_msg else ...
 
-    def desktop_test(self, vm_name: str):
-        vm = VirtualMachine(vm_name)
+    def _create_vm(self, machine_name):
         try:
-            self.vm = self._create_data_vm(self._run_vm(vm), vm_name)
-            self.run_script_on_vm()
-        except Exception as e:
-            host_report_dir = join(self.host.report_dir, self.version, vm_name)
-            FileUtils.create_dir(host_report_dir, silence=True)
-            DesktopReport(self.version, host_report_dir).write(vm_name, 'None', "FAILED")
-            print(f"[red]|ERROR| Exception when testing vm {vm_name}\n\n{e}")
-        finally:
-            vm.stop()
-
-    def _create_data_vm(self, running_vm, machine_name):
-        return LinuxData(
-            user=running_vm.get_logged_user(status=self.test_status),
-            version=self.version,
-            ip=running_vm.get_ip(),
-            name=machine_name
-        )
+            process = self._run_vm(VirtualMachine(machine_name))
+            return LinuxData(
+                vm_process=process,
+                user=process.get_logged_user(status=self.test_status),
+                version=self.version,
+                ip=process.get_ip(),
+                name=machine_name
+            )
+        except VirtualMachinException:
+            self.report.write(machine_name, 'None', "FAILED_CREATE_VM")
 
     def _run_vm(self, vm: VirtualMachine) -> VirtualMachine:
         if vm.check_status():
@@ -81,7 +75,7 @@ class DesktopTests:
         ssh.upload_file(self.host.tg_token, self.vm.tg_token_file)
         ssh.upload_file(self.host.tg_chat_id, self.vm.tg_chat_id_file)
         ssh.upload_file(self._create_file(join(self.host.tmp_dir, 'service'), self.vm.my_service()), self.vm.my_service_path)
-        ssh.upload_file(self._create_file(join(self.host.tmp_dir, 'script.sh'),self.vm.script_sh()), self.vm.script_path)
+        ssh.upload_file(self._create_file(join(self.host.tmp_dir, 'script.sh'), self.vm.script_sh()), self.vm.script_path)
 
     def _start_my_service(self, ssh: SshClient):
         ssh.ssh_exec_commands(f"sudo rm /var/log/journal/*/*.journal")  # clean journal
@@ -105,7 +99,11 @@ class DesktopTests:
         print(f'[green]|INFO|Download reports dir: {self.vm.report_path}')
         host_report_dir = join(self.host.report_dir, self.version, self.vm.name)
         FileUtils.create_dir(host_report_dir, silence=True)
-        ssh.download_dir(self.vm.report_path, host_report_dir)
+        try:
+            ssh.download_dir(self.vm.report_path, host_report_dir)
+        except Exception as e:
+            self.report.write(self.vm.name, "REPORT_NOT_EXISTS")
+            print(f"[red]|ERROR| Can't download report from {self.vm.name}.\nError: {e}")
 
     @staticmethod
     def _create_file(path: str, text: str) -> str:

@@ -8,6 +8,8 @@ from ..console import MyConsole
 console = MyConsole().console
 print = console.print
 
+class VirtualMachinException(Exception): ...
+
 class VirtualMachine:
     def __init__(self, vm_name:str):
         self.name = vm_name
@@ -27,10 +29,11 @@ class VirtualMachine:
                 print(f'[green]|INFO|{self.name}| List of logged-in users {output}')
                 if len(output.split(':')) >= 2:
                     return output.split(':')[1].strip()
-                raise print(f"[red]|ERROR|{self.name}| Cant get logged-in users output: {output}")
+                raise VirtualMachinException(f"[red]|ERROR|{self.name}| Cant get logged-in users output: {output}")
             time.sleep(1)
-        raise print(
-            f"[red]|ERROR|{self.name}| Waiting time for the virtual machine {self.name} Logged In Users List has expired"
+        raise VirtualMachinException(
+            f"[red]|ERROR|{self.name}| Waiting time for the virtual machine {self.name}"
+            f" Logged In Users List has expired"
         )
 
     def wait_net_up(self, timeout: int = 300, status: console.status = None):
@@ -44,7 +47,7 @@ class VirtualMachine:
                 status.stop() if status else ...
                 return print(f'[green]|INFO|{self.name}| The network adapter is running, ip: {output}')
             time.sleep(1)
-        raise print(
+        raise VirtualMachinException(
             f"[red]|ERROR|{self.name}| Waiting time for the virtual machine network adapter to start has expired"
         )
 
@@ -52,7 +55,7 @@ class VirtualMachine:
         output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
         if output and output != 'No value set!':
             return output.split(':')[1].strip()
-        raise print(f"[red]|ERROR|{self.name}| Failed to get the ip address of the virtual machine.")
+        raise VirtualMachinException(f"[red]|ERROR|{self.name}| Failed to get the ip address of the virtual machine.")
 
     @staticmethod
     def _run_cmd(command):

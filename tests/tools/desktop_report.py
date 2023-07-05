@@ -11,10 +11,10 @@ class DesktopReport:
         self.dir = report_dir
         self.path = join(self.dir, f"{version}_desktop_report.csv")
         FileUtils.create_dir(self.dir, silence=True)
-        self._writer(self.path, 'w', ['Os', 'Version', 'Package_name', 'Exit_code'])
+        self._writer(self.path, 'w', ['Os', 'VM Name', 'Version', 'Package_name', 'Exit_code'])
 
-    def write(self, os: str, package_name: str, exit_code: str):
-        self._writer(self.path, 'a', [os, self.version, package_name, exit_code])
+    def write(self, os: str,  exit_code: str):
+        self._writer(self.path, 'a', [os, self.version, "Nan", exit_code])
 
     @staticmethod
     def _writer(file_path: str, mode: str, message: list, delimiter='\t', encoding='utf-8'):

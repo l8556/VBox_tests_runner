@@ -3,7 +3,6 @@ import time
 import concurrent.futures
 import signal
 
-from frameworks.telegram import Telegram
 from tests.desktop_tests import DesktopTests
 
 
@@ -14,8 +13,7 @@ def handle_interrupt(signum, frame):
 signal.signal(signal.SIGINT, handle_interrupt)
 
 def run_test(version, vm_name):
-    test = DesktopTests(version=version)
-    test.desktop_test(vm_name)
+    DesktopTests(version=version, vm_name=vm_name).run()
 
 def run(version, vm_names: list, max_processes: int = 1, run_timeout: int | float = 0):
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_processes) as executor:
