@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from os.path import join
+from os.path import join, isfile
 
 from frameworks.VBox import VirtualMachine
 from frameworks.console import MyConsole
@@ -8,6 +8,7 @@ from frameworks.report import Report
 from frameworks.ssh_client.ssh_client import SshClient
 from frameworks.telegram import Telegram
 from tests.data import LinuxData, HostData
+from tests.tools.desktop_report import DesktopReport
 
 console = MyConsole().console
 print = console.print
@@ -32,9 +33,16 @@ class DesktopTests:
 
     def desktop_test(self, vm_name: str):
         vm = VirtualMachine(vm_name)
-        self.vm = self._create_data_vm(self._run_vm(vm), vm_name)
-        self.run_script_on_vm()
-        vm.stop()
+        try:
+            self.vm = self._create_data_vm(self._run_vm(vm), vm_name)
+            self.run_script_on_vm()
+        except Exception as e:
+            host_report_dir = join(self.host.report_dir, self.version, vm_name)
+            FileUtils.create_dir(host_report_dir, silence=True)
+            DesktopReport(self.version, host_report_dir).write(vm_name, 'None', "FAILED")
+            print(f"[red]|ERROR| Exception when testing vm {vm_name}\n\n{e}")
+        finally:
+            vm.stop()
 
     def _create_data_vm(self, running_vm, machine_name):
         return LinuxData(
@@ -54,6 +62,7 @@ class DesktopTests:
 
     def merge_reports(self):
         full_report = join(self.report_dir, f"{self.version}_full_report.csv")
+        FileUtils.delete(full_report, silence=True) if isfile(full_report) else ...
         reports = FileUtils.get_paths(self.report_dir, name_include=f"{self.version}", extension='csv')
         Report().merge(reports, full_report)
         return full_report
@@ -96,10 +105,7 @@ class DesktopTests:
         print(f'[green]|INFO|Download reports dir: {self.vm.report_path}')
         host_report_dir = join(self.host.report_dir, self.version, self.vm.name)
         FileUtils.create_dir(host_report_dir, silence=True)
-        try:
-            ssh.download_dir(self.vm.report_path, host_report_dir)
-        except Exception as e:
-            print(f"[red]|WARNING|{self.vm.name}| Exceptions when download report: {e}")
+        ssh.download_dir(self.vm.report_path, host_report_dir)
 
     @staticmethod
     def _create_file(path: str, text: str) -> str:
