@@ -23,8 +23,7 @@ class DesktopTests:
         self.report = DesktopReport(version, join(self.host.report_dir, self.version, self.vm_name))
         self.tg = Telegram(token_path=self.host.tg_token, chat_id_path=self.host.tg_chat_id, tmp_dir=self.host.tmp_dir)
         self.test_status = status if status else None
-        self.report_dir = join(self.host.report_dir, self.version)
-        FileUtils.create_dir((self.report_dir, self.host.tmp_dir), silence=True)
+        FileUtils.create_dir((self.host.report_dir, self.host.tmp_dir), silence=True)
         self.vm = None
 
     def run(self, tg_msg: str = None):
@@ -55,9 +54,9 @@ class DesktopTests:
         return vm
 
     def merge_reports(self):
-        full_report = join(self.report_dir, f"{self.version}_full_report.csv")
+        full_report = join(self.host.report_dir, self.version, f"{self.version}_full_report.csv")
         FileUtils.delete(full_report, silence=True) if isfile(full_report) else ...
-        reports = FileUtils.get_paths(self.report_dir, name_include=f"{self.version}", extension='csv')
+        reports = FileUtils.get_paths(self.host.report_dir, name_include=f"{self.version}", extension='csv')
         Report().merge(reports, full_report)
         return full_report
 
