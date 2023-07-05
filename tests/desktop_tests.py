@@ -44,7 +44,7 @@ class DesktopTests:
                 name=machine_name
             )
         except VirtualMachinException:
-            self.report.write(machine_name, 'None', "FAILED_CREATE_VM")
+            self.report.write(machine_name, "FAILED_CREATE_VM")
 
     def _run_vm(self, vm: VirtualMachine) -> VirtualMachine:
         if vm.check_status():
