@@ -92,7 +92,6 @@ class DesktopTests:
     def _wait_execute_service(self, ssh: SshClient):
         print(f"[red]{'-' * 90}\n|INFO|{self.vm.name}| Wait executing script on vm\n{'-' * 90}")
         ssh.wait_execute_service(self.vm.my_service_name, status=self.test_status)
-        ssh.ssh_exec_commands(f'sudo systemctl disable {self.vm.my_service_name}')
 
     def _download_report(self, ssh: SshClient):
         print(f'[green]|INFO|Download reports dir: {self.vm.report_path}')
