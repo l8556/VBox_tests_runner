@@ -26,8 +26,10 @@ def desktop_test(c, version=None, name=None, processes=None):
         Telegram().send_document(DesktopTests(version=version, vm_name='None').merge_reports(), caption=msg)
     else:
         for vm in Vbox().check_vm_names(vm_names):
-            DesktopTests(version=version, vm_name=vm, status=console.status('')).run(tg_msg=msg if not name else None)
-    Telegram().send_document(DesktopTests(version=version, vm_name='None').merge_reports(), caption=msg)
+            DesktopTests(version=version, vm_name=vm, status=console.status('')).run()
+    full_report = DesktopTests(version=version, vm_name='None').merge_reports()
+    if not name:
+        Telegram().send_document(full_report, caption=msg)
 
 @task
 def run_vm(c, name: str = '', headless=False):

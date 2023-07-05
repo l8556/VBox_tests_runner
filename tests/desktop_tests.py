@@ -26,23 +26,24 @@ class DesktopTests:
         FileUtils.create_dir((self.host.report_dir, self.host.tmp_dir), silence=True)
         self.vm = None
 
-    def run(self, tg_msg: str = None):
-        self.vm = self._create_vm(self.vm_name)
-        self.run_script_on_vm()
-        self.vm.vm_process.stop()
-
-    def _create_vm(self, machine_name):
+    def run(self):
+        _virtual_machine = VirtualMachine(self.vm_name)
         try:
-            process = self._run_vm(VirtualMachine(machine_name))
-            return LinuxData(
-                vm_process=process,
-                user=process.get_logged_user(status=self.test_status),
-                version=self.version,
-                ip=process.get_ip(),
-                name=machine_name
-            )
+            self.vm = self._create_vm(self._run_vm(_virtual_machine))
+            self.run_script_on_vm()
         except VirtualMachinException:
-            self.report.write(machine_name, "FAILED_CREATE_VM")
+            self.report.write(self.vm_name, "FAILED_CREATE_VM")
+        finally:
+            _virtual_machine.stop()
+
+    def _create_vm(self, process):
+        return LinuxData(
+            vm_process=process,
+            user=process.get_logged_user(status=self.test_status),
+            version=self.version,
+            ip=process.get_ip(),
+            name=self.vm_name
+        )
 
     def _run_vm(self, vm: VirtualMachine) -> VirtualMachine:
         if vm.check_status():
