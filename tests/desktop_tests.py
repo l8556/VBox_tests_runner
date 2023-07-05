@@ -30,7 +30,6 @@ class DesktopTests:
         self.vm = self._create_vm(self.vm_name)
         self.run_script_on_vm()
         self.vm.vm_process.stop()
-        self.tg.send_document(self.merge_reports(), caption=tg_msg) if tg_msg else ...
 
     def _create_vm(self, machine_name):
         try:
