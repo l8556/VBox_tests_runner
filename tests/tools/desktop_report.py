@@ -9,7 +9,7 @@ class DesktopReport:
     def __init__(self, version, report_dir):
         self.version = version
         self.dir = report_dir
-        self.path = join(self.dir, f"{version}_desktop_report.csv")
+        self.path = join(self.dir, f"{version}_desktop_runer_report.csv")
         FileUtils.create_dir(self.dir, silence=True)
         self._writer(self.path, 'w', ['Os', 'VM Name', 'Version', 'Package_name', 'Exit_code'])
 

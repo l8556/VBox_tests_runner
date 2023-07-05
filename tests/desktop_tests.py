@@ -97,10 +97,8 @@ class DesktopTests:
 
     def _download_report(self, ssh: SshClient):
         print(f'[green]|INFO|Download reports dir: {self.vm.report_path}')
-        host_report_dir = join(self.host.report_dir, self.version, self.vm.name)
-        FileUtils.create_dir(host_report_dir, silence=True)
         try:
-            ssh.download_dir(self.vm.report_path, host_report_dir)
+            ssh.download_dir(self.vm.report_path, self.report.dir)
         except Exception as e:
             self.report.write(self.vm.name, "REPORT_NOT_EXISTS")
             print(f"[red]|ERROR| Can't download report from {self.vm.name}.\nError: {e}")
