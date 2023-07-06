@@ -51,8 +51,8 @@ class LinuxData(VmData):
         cd {self.script_dir}
         git clone {'-b ' if self.branch else ''}{self.branch if self.branch else ''} {self.desktop_testing_url}
         cd {self.desktop_testing_path}
-        {'/home/l02/.pyenv/versions/3.9.7/bin/python' if self.name == 'Ubuntu16' else 'python3'} -m venv .venv
-        source ./.venv/bin/activate
+        python3 -m venv venv
+        source ./venv/bin/activate
         python3 ./make_requirements.py
-        invoke desktop-test -v {self.version}\
+        invoke desktop-test -v {self.version}{' -t' if self.telegram else ''}\
         '''

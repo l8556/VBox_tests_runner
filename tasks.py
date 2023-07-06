@@ -16,7 +16,7 @@ print = console.print
 
 
 @task
-def desktop_test(c, version=None, name=None, processes=None):
+def desktop_test(c, version=None, name=None, processes=None, telegram=False):
     version = version if version else Prompt.ask('[red]Please enter version')
     vm_names = [name] if name else FileUtils.read_json(join(os.getcwd(), 'config.json'))['hosts']
     num_processes = int(processes) if processes else 1
@@ -26,7 +26,7 @@ def desktop_test(c, version=None, name=None, processes=None):
         Telegram().send_document(DesktopTests(version=version, vm_name='None').merge_reports(), caption=msg)
     else:
         for vm in Vbox().check_vm_names(vm_names):
-            DesktopTests(version=version, vm_name=vm, status=console.status('')).run()
+            DesktopTests(version=version, vm_name=vm, status=console.status(''), telegram=telegram).run()
     full_report = DesktopTests(version=version, vm_name='None').merge_reports()
     if not name:
         Telegram().send_document(full_report, caption=msg)

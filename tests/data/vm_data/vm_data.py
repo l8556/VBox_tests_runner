@@ -10,6 +10,7 @@ from frameworks.host_control import FileUtils
 @dataclass
 class VmData:
     vm_process: VirtualMachine
+    telegram: bool
     user: str
     ip: str
     name: str

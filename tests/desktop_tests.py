@@ -16,9 +16,10 @@ print = console.print
 
 
 class DesktopTests:
-    def __init__(self, version: str, vm_name: str, status = None):
+    def __init__(self, version: str, vm_name: str, status = None, telegram: bool = False):
         self.version = version
         self.vm_name = vm_name
+        self.telegram = telegram
         self.host = HostData()
         self.report = DesktopReport(version, join(self.host.report_dir, self.version, self.vm_name))
         self.tg = Telegram(token_path=self.host.tg_token, chat_id_path=self.host.tg_chat_id, tmp_dir=self.host.tmp_dir)
@@ -42,7 +43,8 @@ class DesktopTests:
             user=process.get_logged_user(status=self.test_status),
             version=self.version,
             ip=process.get_ip(),
-            name=self.vm_name
+            name=self.vm_name,
+            telegram=self.telegram
         )
 
     def _run_vm(self, vm: VirtualMachine) -> VirtualMachine:
