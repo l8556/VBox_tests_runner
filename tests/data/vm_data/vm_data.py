@@ -15,5 +15,6 @@ class VmData:
     ip: str
     name: str
     version: str
+    custom_config: bool
     desktop_testing_url: str = FileUtils.read_json(join(os.getcwd(), 'config.json'))['desktop_script']
     branch: str = FileUtils.read_json(join(os.getcwd(), 'config.json'))['branch']

@@ -12,11 +12,13 @@ class HostData:
     project_dir: str = join(os.getcwd())
     tg_dir: str = join(os.path.expanduser('~'), '.telegram')
     tmp_dir: str = join(project_dir, 'tmp')
-    report_dir = join(project_dir, 'reports')
+    report_dir: str = join(project_dir, 'reports')
+    config_path: str = join(os.getcwd(), 'config.json')
+    custom_config: str = join(project_dir, 'custom_coinfigs', 'portal_config.json')
 
     @property
     def config(self):
-        return FileUtils.read_json(join(os.getcwd(), 'config.json'))
+        return FileUtils.read_json(self.config_path)
 
     @property
     def tg_token(self):

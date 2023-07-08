@@ -16,7 +16,8 @@ print = console.print
 
 
 class DesktopTests:
-    def __init__(self, version: str, vm_name: str, status = None, telegram: bool = False):
+    def __init__(self, version: str, vm_name: str, status = None, telegram: bool = False, custom_config: bool = False):
+        self.custom_config = custom_config
         self.version = version
         self.vm_name = vm_name
         self.telegram = telegram
@@ -44,7 +45,8 @@ class DesktopTests:
             version=self.version,
             ip=process.get_ip(),
             name=self.vm_name,
-            telegram=self.telegram
+            telegram=self.telegram,
+            custom_config=self.custom_config
         )
 
     def _run_vm(self, vm: VirtualMachine) -> VirtualMachine:
@@ -77,6 +79,8 @@ class DesktopTests:
         ssh.upload_file(self.host.tg_chat_id, self.vm.tg_chat_id_file)
         ssh.upload_file(self._create_file(join(self.host.tmp_dir, 'service'), self.vm.my_service()), self.vm.my_service_path)
         ssh.upload_file(self._create_file(join(self.host.tmp_dir, 'script.sh'), self.vm.script_sh()), self.vm.script_path)
+        if self.custom_config:
+            ssh.upload_file(self.host.custom_config, self.vm.custom_config_path)
 
     def _start_my_service(self, ssh: SshClient):
         ssh.ssh_exec_commands(f"sudo rm /var/log/journal/*/*.journal")  # clean journal
