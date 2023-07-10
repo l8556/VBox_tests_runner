@@ -94,14 +94,14 @@ class SshClient:
         status_msg = f"[cyan]|INFO|{self.host_name}|{self.host}| Waiting for execute {service_name}"
         status.start() if status else print(status_msg)
         while self.exec_command(f'systemctl is-active {service_name}') == 'active':
-            status.update(f"{status_msg}\n{self.exec_command(f'journalctl -n 20 -u {service_name}')}") if status else ...
-            time.sleep(0.2)
+            status.update(f"{status_msg}\n{self.exec_command(f'sudo journalctl -n 20 -u {service_name}')}") if status else ...
+            time.sleep(0.5)
             if isinstance(timeout, int) and (time.time() - start_time) >= timeout:
                 raise print(f'[bold red]|WARNING|{self.host_name}|{self.host}| The service {service_name} waiting time has expired ')
         status.stop() if status else ...
         print(
             f"[blue]{'-' * 90}\n|INFO|{self.host_name}|{self.host}|Service {service_name} log:\n{'-' * 90}\n\n"
-            f"{self.exec_command(f'journalctl -n 1000 -u {service_name}')}\n{'-' * 90}"
+            f"{self.exec_command(f'sudo journalctl -n 1000 -u {service_name}')}\n{'-' * 90}"
         )
 
     def exec_command(self, command: str) -> str | None:

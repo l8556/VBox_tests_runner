@@ -16,7 +16,7 @@ class LinuxData(VmData):
         self.desktop_testing_path = f"{self.script_dir}/{splitext(basename(self.desktop_testing_url))[0]}"
         self.venv_path = f"{self.desktop_testing_path}/.venv/bin/activate"
         self.report_path = f'{self.desktop_testing_path}/reports/{self.version}'
-        self.custom_config_path = f"{self.desktop_testing_path}/portal_config.json"
+        self.custom_config_path = f"{self.script_dir}/portal_config.json"
         self.tg_dir = f"{self.home_dir}/.telegram"
         self.tg_token_file = f"{self.tg_dir}/token"
         self.tg_chat_id_file = f"{self.tg_dir}/chat"
@@ -52,6 +52,7 @@ class LinuxData(VmData):
         cd {self.script_dir}
         git clone {'-b ' if self.branch else ''}{self.branch if self.branch else ''} {self.desktop_testing_url}
         cd {self.desktop_testing_path}
+        {'# ' if not self.custom_config else ''}mv {self.custom_config_path} {self.desktop_testing_path}
         python3 -m venv venv
         source ./venv/bin/activate
         python3 ./make_requirements.py
