@@ -16,11 +16,11 @@ print = console.print
 
 
 @task
-def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=False, custom_config=False, full=False):
+def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=False, custom_config=False):
     version = version if version else Prompt.ask('[red]Please enter version')
     vm_names = [name] if name else _get_hosts(custom_config)
     num_processes = int(processes) if processes else 1
-    msg = f"Full testing of Desktop Editors Completed on version: {version}"
+    msg = f"OnlyOffice desktop editors tests completed on version: {version}"
     if num_processes > 1:
         multiprocess.run(version, Vbox().check_vm_names(vm_names), num_processes, 10)
         Telegram().send_document(DesktopTests(version=version, vm_name='None').merge_reports(), caption=msg)
@@ -31,18 +31,16 @@ def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=F
                 vm_name=vm,
                 status=console.status(''),
                 telegram=detailed_telegram,
-                custom_config=True if custom_config or full else False
+                custom_config=custom_config
             ).run()
     full_report = DesktopTests(version=version, vm_name='None').merge_reports()
     if not name:
         Telegram().send_document(full_report, caption=msg)
 
-def _get_hosts(custom_config: bool = False, full: bool =False) -> list:
+def _get_hosts(custom_config: bool = False) -> list:
     config_path = join(os.getcwd(), 'config.json')
-    custom_config_path = join(os.getcwd(), 'custom_coinfigs', 'portal_config.json')
-    if (custom_config and isfile(custom_config_path)) or (full and isfile(custom_config_path)):
-        if full:
-            return FileUtils.read_json(config_path)['hosts'] + FileUtils.read_json(custom_config_path)['hosts']
+    custom_config_path = join(os.getcwd(), 'custom_configs', 'custom_config.json')
+    if custom_config and isfile(custom_config_path):
         return FileUtils.read_json(custom_config_path)['hosts']
     return FileUtils.read_json(config_path)['hosts']
 

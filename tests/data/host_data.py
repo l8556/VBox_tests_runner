@@ -14,7 +14,7 @@ class HostData:
     tmp_dir: str = join(project_dir, 'tmp')
     report_dir: str = join(project_dir, 'reports')
     config_path: str = join(os.getcwd(), 'config.json')
-    custom_config: str = join(project_dir, 'custom_coinfigs', 'portal_config.json')
+    custom_config: str = join(project_dir, 'custom_configs', 'custom_config.json')
 
     @property
     def config(self):
