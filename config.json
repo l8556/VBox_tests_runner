@@ -6,6 +6,7 @@
   "hosts": [
     "OpenSUSE15",
     "Ubuntu16",
+    "Ubuntu20",
     "Ubuntu22",
     "CentOs9",
     "CentOs7",
@@ -13,7 +14,6 @@
     "Fedora37",
     "Kubuntu22",
     "Mint21",
-    "PopOs22",
-    "RedOs7.3"
+    "PopOs22"
   ]
 }
