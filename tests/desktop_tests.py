@@ -55,6 +55,8 @@ class DesktopTests:
         if vm.check_status():
             vm.stop()
         vm.restore_snapshot()
+        vm.set_cpus(5)
+        vm.set_memory(4096)
         vm.run(headless=True)
         vm.wait_net_up(status=self.test_status, timeout=600)
         return vm
