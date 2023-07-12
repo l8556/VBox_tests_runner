@@ -30,6 +30,8 @@ class DesktopTests:
 
     def run(self):
         _virtual_machine = VirtualMachine(self.vm_name)
+        _virtual_machine.set_cpus(4)
+        _virtual_machine.set_memory(4096)
         try:
             self.vm = self._create_vm(self._run_vm(_virtual_machine))
             self.run_script_on_vm()

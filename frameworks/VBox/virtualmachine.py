@@ -17,6 +17,14 @@ class VirtualMachine:
     def wait_boot(self):
         self._run_cmd(f"{cmd.wait} {self.name} VBoxServiceHeartbeat")
 
+    def set_cpus(self, num: int):
+        print(f"{cmd.modifyvm} {self.name} --cpus {num}")
+        self._run_cmd(f"{cmd.modifyvm} {self.name} --cpus {num}")
+
+    def set_memory(self, num: int):
+        print(f"{cmd.modifyvm} {self.name} --memory {num}")
+        self._run_cmd(f"{cmd.modifyvm} {self.name} --memory {num}")
+
     def get_logged_user(self, timeout: int = 300, status: console.status = None) -> str | None:
         start_time = time.time()
         status_msg = f"[cyan]|INFO|{self.name}| Waiting for Logged In Users List"

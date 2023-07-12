@@ -6,6 +6,7 @@
   "hosts": [
     "OpenSUSE15",
     "Ubuntu16",
+    "Ubuntu18",
     "Ubuntu20",
     "Ubuntu22",
     "CentOs9",
