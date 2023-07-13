@@ -83,7 +83,7 @@ class DesktopTests:
         ssh.upload_file(self.host.tg_chat_id, self.vm.tg_chat_id_file)
         ssh.upload_file(self._create_file(join(self.host.tmp_dir, 'service'), self.vm.my_service()), self.vm.my_service_path)
         ssh.upload_file(self._create_file(join(self.host.tmp_dir, 'script.sh'), self.vm.script_sh()), self.vm.script_path)
-        ssh.upload_file(self.host.config, self.vm.custom_config_path)
+        ssh.upload_file(self.host.config_path, self.vm.custom_config_path)
 
     def _start_my_service(self, ssh: SshClient):
         ssh.ssh_exec_commands(f"sudo rm /var/log/journal/*/*.journal")  # clean journal
