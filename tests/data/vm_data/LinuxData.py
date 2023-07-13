@@ -52,9 +52,8 @@ class LinuxData(VmData):
         cd {self.script_dir}
         git clone {'-b ' if self.branch else ''}{self.branch if self.branch else ''} {self.desktop_testing_url}
         cd {self.desktop_testing_path}
-        {'# ' if not self.custom_config else ''}mv {self.custom_config_path} {self.desktop_testing_path}
         python3 -m venv venv
         source ./venv/bin/activate
         python3 ./make_requirements.py
-        invoke desktop-test -v {self.version}{' -t' if self.telegram else ''}{' -c' if self.custom_config else ''}\
+        invoke desktop-test -v {self.version}{' -t' if self.telegram else ''}{(' -c '+ self.custom_config_path) if self.custom_config else ''}\
         '''
