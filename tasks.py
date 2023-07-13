@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-import json
 import os
-from os.path import join, isfile
+from os.path import join
 
 from invoke import task
 from rich.prompt import Prompt

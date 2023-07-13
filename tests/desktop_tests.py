@@ -39,25 +39,14 @@ class DesktopTests:
     def run(self):
         virtual_machine = VirtualMachine(self.vm_name)
         try:
-            self.vm = self._create_vm(self._run_vm(virtual_machine))
+            self.vm = self._create_vm(self.run_vm(virtual_machine))
             self.run_script_on_vm()
         except VirtualMachinException:
             self.report.write(self.vm_name, "FAILED_CREATE_VM")
         finally:
             virtual_machine.stop()
 
-    def _create_vm(self, running_vm: VirtualMachine):
-        return LinuxData(
-            vm_process=running_vm,
-            user=running_vm.get_logged_user(),
-            version=self.version,
-            ip=running_vm.get_ip(),
-            name=self.vm_name,
-            telegram=self.telegram,
-            custom_config=self.custom_config
-        )
-
-    def _run_vm(self, vm: VirtualMachine) -> VirtualMachine:
+    def run_vm(self, vm: VirtualMachine) -> VirtualMachine:
         if vm.check_status():
             vm.stop()
         vm.restore_snapshot()
@@ -114,3 +103,14 @@ class DesktopTests:
     def _create_file(path: str, text: str) -> str:
         FileUtils.file_writer(path, '\n'.join(line.strip() for line in text.split('\n')), newline='')
         return path
+
+    def _create_vm(self, running_vm: VirtualMachine):
+        return LinuxData(
+            vm_process=running_vm,
+            user=running_vm.get_logged_user(),
+            version=self.version,
+            ip=running_vm.get_ip(),
+            name=self.vm_name,
+            telegram=self.telegram,
+            custom_config=self.custom_config
+        )
