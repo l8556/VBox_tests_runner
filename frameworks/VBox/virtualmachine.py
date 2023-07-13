@@ -14,16 +14,13 @@ class VirtualMachine:
     def __init__(self, vm_name:str):
         self.name = vm_name
 
-    def wait_boot(self):
-        self._run_cmd(f"{cmd.wait} {self.name} VBoxServiceHeartbeat")
-
     def set_cpus(self, num: int):
-        print(f"{cmd.modifyvm} {self.name} --cpus {num}")
         self._run_cmd(f"{cmd.modifyvm} {self.name} --cpus {num}")
+        print(f"[green]|INFO|{self.name} The number of processor cores is set to {num}")
 
     def set_memory(self, num: int):
-        print(f"{cmd.modifyvm} {self.name} --memory {num}")
         self._run_cmd(f"{cmd.modifyvm} {self.name} --memory {num}")
+        print(f"[green]|INFO|{self.name}| Installed RAM quantity: {num}")
 
     def get_logged_user(self, timeout: int = 300, status: console.status = None) -> str | None:
         start_time = time.time()
