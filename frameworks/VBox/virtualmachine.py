@@ -22,49 +22,55 @@ class VirtualMachine:
         self._run_cmd(f"{cmd.modifyvm} {self.name} --memory {num}")
         print(f"[green]|INFO|{self.name}| Installed RAM quantity: {num}")
 
-    def get_logged_user(self, timeout: int = 300, status: console.status = None) -> str | None:
+    def wait_logged_user(self, timeout: int = 300, status_bar: bool = True) -> None:
         start_time = time.time()
         status_msg = f"[cyan]|INFO|{self.name}| Waiting for Logged In Users List"
-        status.start() if status else print(status_msg)
+        status = console.status(status_msg)
+        status.start() if status_bar else print(status_msg)
         while time.time() - start_time < timeout:
-            output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/OS/LoggedInUsersList"')
-            status.update(f"{status_msg}: {(time.time() - start_time):.00f}/{timeout}") if status else ...
-            if output and output != 'No value set!':
-                status.stop() if status else ...
-                print(f'[green]|INFO|{self.name}| List of logged-in users {output}')
-                if len(output.split(':')) >= 2:
-                    return output.split(':')[1].strip()
-                raise VirtualMachinException(f"[red]|ERROR|{self.name}| Cant get logged-in users output: {output}")
+            status.update(f"{status_msg}: {(time.time() - start_time):.00f}/{timeout}") if status_bar else ...
+            user_name = self.get_logged_user()
+            if user_name:
+                status.stop() if status_bar else ...
+                print(f'[green]|INFO|{self.name}| List of logged-in user {user_name}')
+                break
             time.sleep(1)
-        raise VirtualMachinException(
-            f"[red]|ERROR|{self.name}| Waiting time for the virtual machine {self.name}"
-            f" Logged In Users List has expired"
-        )
+        else:
+            raise VirtualMachinException(
+                f"[red]|ERROR|{self.name}| Waiting time for the virtual machine {self.name} "
+                f"Logged In Users List has expired"
+            )
 
-    def wait_net_up(self, timeout: int = 300, status: console.status = None):
+    def get_logged_user(self) -> str | None:
+        output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/OS/LoggedInUsersList"')
+        if output and output != 'No value set!':
+            if len(output.split(':')) >= 2:
+                return output.split(':')[1].strip()
+        return None
+
+    def wait_net_up(self, timeout: int = 300, status_bar: bool = True):
         start_time = time.time()
-        status_msg = f"[cyan]|INFO|{self.name}| Waiting for network adapter up"
-        status.start() if status else print(status_msg)
+        msg = f"[cyan]|INFO|{self.name}| Waiting for network adapter up"
+        status = console.status(msg)
+        status.start() if status_bar else print(msg)
         while time.time() - start_time < timeout:
-            output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
-            status.update(f"{status_msg}: {(time.time() - start_time):.00f}/{timeout}") if status else ...
-            if output and output != 'No value set!':
-                status.stop() if status else ...
-                return print(f'[green]|INFO|{self.name}| The network adapter is running, ip: {output}')
+            status.update(f"{msg}: {(time.time() - start_time):.00f}/{timeout}") if status_bar else ...
+            ip_address = self.get_ip()
+            if ip_address:
+                status.stop() if status_bar else ...
+                print(f'[green]|INFO|{self.name}| The network adapter is running, ip: {ip_address}')
+                break
             time.sleep(1)
-        raise VirtualMachinException(
-            f"[red]|ERROR|{self.name}| Waiting time for the virtual machine network adapter to start has expired"
-        )
+        else:
+            raise VirtualMachinException(
+                f"[red]|ERROR|{self.name}| Waiting time for the virtual machine network adapter to start has expired"
+            )
 
-    def get_ip(self) -> str:
+    def get_ip(self) -> str | None:
         output = getoutput(f'{cmd.guestproperty} {self.name} "/VirtualBox/GuestInfo/Net/0/V4/IP"')
         if output and output != 'No value set!':
             return output.split(':')[1].strip()
-        raise VirtualMachinException(f"[red]|ERROR|{self.name}| Failed to get the ip address of the virtual machine.")
-
-    @staticmethod
-    def _run_cmd(command):
-        call(command, shell=True)
+        return None
 
     def snapshot_list(self) -> list:
         return getoutput(f"{cmd.snapshot} {self.name} list").split('\n')
@@ -113,3 +119,7 @@ class VirtualMachine:
 
     def out_info(self):
         self._run_cmd(f'{cmd.enumerate} {self.name}')
+
+    @staticmethod
+    def _run_cmd(command):
+        call(command, shell=True)

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import os
 from os.path import join, isfile
 
@@ -8,9 +9,12 @@ from rich import print
 from frameworks.VBox import VirtualMachine, Vbox
 from frameworks.host_control import FileUtils
 from frameworks.telegram import Telegram
+from tests.data import HostData
 from tests.desktop_tests import DesktopTests
 import tests.multiprocessing as multiprocess
 from frameworks.console import MyConsole
+from tests.tools.desktop_report import DesktopReport
+
 console = MyConsole().console
 print = console.print
 
@@ -18,41 +22,42 @@ print = console.print
 @task
 def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=False, custom_config=False):
     version = version if version else Prompt.ask('[red]Please enter version')
-    vm_names = [name] if name else _get_hosts(custom_config)
+    config = join(os.getcwd(), 'custom_config.json') if custom_config else join(os.getcwd(), 'config.json')
+    vm_names = [name] if name else FileUtils.read_json(config)['hosts']
     num_processes = int(processes) if processes else 1
-    msg = f"OnlyOffice desktop editors tests completed on version: {version}"
+    msg = f"{FileUtils.read_json(config).get('title')} desktop editors tests completed on version: {version}"
     if num_processes > 1:
         multiprocess.run(version, Vbox().check_vm_names(vm_names), num_processes, 10)
-        Telegram().send_document(DesktopTests(version=version, vm_name='None').merge_reports(), caption=msg)
+        Telegram().send_document(
+            DesktopReport(version=version, report_dir=join(HostData(config).report_dir, version)).merge_reports(),
+            caption=msg
+        )
     else:
         for vm in Vbox().check_vm_names(vm_names):
             DesktopTests(
                 version=version,
                 vm_name=vm,
-                status=console.status(''),
                 telegram=detailed_telegram,
+                config_path=config,
                 custom_config=custom_config
             ).run()
-    full_report = DesktopTests(version=version, vm_name='None').merge_reports()
+    full_report = DesktopReport(version=version, report_dir=join(HostData(config).report_dir, version)).merge_reports()
     if not name:
         Telegram().send_document(full_report, caption=msg)
-
-def _get_hosts(custom_config: bool = False) -> list:
-    config_path = join(os.getcwd(), 'config.json')
-    custom_config_path = join(os.getcwd(), 'custom_configs', 'custom_config.json')
-    if custom_config and isfile(custom_config_path):
-        return FileUtils.read_json(custom_config_path)['hosts']
-    return FileUtils.read_json(config_path)['hosts']
 
 @task
 def run_vm(c, name: str = '', headless=False):
     vm = VirtualMachine(Vbox().check_vm_names(name))
     vm.run(headless=headless)
     vm.wait_net_up(status=console.status(''))
-    return print(vm.get_ip()), print(vm.get_logged_user())
+    return print(vm.get_ip()), print(vm.wait_logged_user())
 
 @task
-def stop_vm(c, name: str = ''):
+def stop_vm(c, name: str = '', all: bool = False):
+    if all:
+        for vm in Vbox.vm_list():
+            VirtualMachine(vm).stop()
+        return
     VirtualMachine(Vbox().check_vm_names(name)).stop()
 
 @task
@@ -62,8 +67,3 @@ def vm_list(c):
 @task
 def out_info(c, name: str = ''):
     VirtualMachine(Vbox().check_vm_names(name)).out_info()
-
-
-def _run_test(version):
-    test = DesktopTests(version=version)
-    test.desktop_test()

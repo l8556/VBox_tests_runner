@@ -9,6 +9,7 @@ from frameworks.console import MyConsole
 console = MyConsole().console
 print = console.print
 
+class SshClientException(Exception): ...
 
 class SshClient:
     def __init__(self, host: str, host_name: str = None):
@@ -23,46 +24,6 @@ class SshClient:
         self.close_sftp_chanel()
         self.close_ssh_chanel()
         self.close()
-
-    def close_sftp_chanel(self):
-        if self.sftp:
-            self.sftp.close()
-
-    def upload_file(self, local, remote):
-        if self.sftp:
-            print(f'[green]|INFO|{self.host_name}|{self.host}| Upload file: {basename(local)} to {remote}')
-            self.sftp.putfo(open(local, 'rb'), remote)
-            local_file_size = os.stat(local).st_size
-            while True:
-                remote_file_size = self.sftp.stat(remote).st_size
-                if remote_file_size == local_file_size:
-                    break
-        else:
-            raise print(f'[red]|WARNING|{self.host_name}|{self.host}| Sftp chanel not created.')
-
-    def download_dir(self, remote, local):
-        if self.sftp:
-            for entry in self.sftp.listdir_attr(remote):
-                remote_filename = join(remote, entry.filename).replace('\\', '/')
-                local_filename = join(local, entry.filename)
-                if entry.st_mode & 0o170000 == 0o040000:
-                    os.makedirs(local_filename, exist_ok=True)
-                    self.download_dir(remote_filename, local_filename)
-                else:
-                    self.download_file(remote_filename, local_filename)
-
-    def download_file(self, remote, local):
-        if self.sftp:
-            with open(local, 'wb') as local_file:
-                self.sftp.getfo(remote, local_file)
-                remote_file_size = self.sftp.stat(remote).st_size
-                while local_file.tell() < remote_file_size:
-                    time.sleep(0.2)
-        else:
-            raise print(f'[red]|WARNING|{self.host_name}|{self.host}| Sftp chanel not created.')
-
-    def create_sftp_chanel(self):
-        self.sftp = self.client.open_sftp()
 
     def connect(self, username: str, timeout: int = 300):
         print(f"[green]|INFO|{self.host_name}|{self.host}| Connect to host.")
@@ -85,24 +46,77 @@ class SshClient:
                 time.sleep(3)
                 continue
             except Exception as e:
-                print(f"[red]|ERROR|{self.host_name}|{self.host}| Failed to connect: {username}@{self.host}.\nWaiting and retrying...")
+                print(
+                    f"[red]|ERROR|{self.host_name}|{self.host}| "
+                    f"Failed to connect: {username}@{self.host}.\nWaiting and retrying..."
+                )
                 time.sleep(3)
                 continue
 
-    def wait_execute_service(self, service_name: str, timeout: int = None, status: console.status = None):
+    def close_sftp_chanel(self):
+        if self.sftp:
+            self.sftp.close()
+
+    def upload_file(self, local, remote):
+        if self.sftp:
+            print(f'[green]|INFO|{self.host_name}|{self.host}| Upload file: {basename(local)} to {remote}')
+            self.sftp.putfo(open(local, 'rb'), remote)
+            local_file_size = os.stat(local).st_size
+            while True:
+                remote_file_size = self.sftp.stat(remote).st_size
+                if remote_file_size == local_file_size:
+                    break
+        else:
+            raise SshClientException(f'[red]|WARNING|{self.host_name}|{self.host}| Sftp chanel not created.')
+
+    def download_dir(self, remote, local):
+        if self.sftp:
+            for entry in self.sftp.listdir_attr(remote):
+                remote_filename = join(remote, entry.filename).replace('\\', '/')
+                local_filename = join(local, entry.filename)
+                if entry.st_mode & 0o170000 == 0o040000:
+                    os.makedirs(local_filename, exist_ok=True)
+                    self.download_dir(remote_filename, local_filename)
+                else:
+                    self.download_file(remote_filename, local_filename)
+
+    def download_file(self, remote, local):
+        if self.sftp:
+            with open(local, 'wb') as local_file:
+                self.sftp.getfo(remote, local_file)
+                remote_file_size = self.sftp.stat(remote).st_size
+                while local_file.tell() < remote_file_size:
+                    time.sleep(0.2)
+        else:
+            raise SshClientException(f'[red]|WARNING|{self.host_name}|{self.host}| Sftp chanel not created.')
+
+    def create_sftp_chanel(self):
+        self.sftp = self.client.open_sftp()
+
+    def wait_execute_service(self, service_name: str, timeout: int = None, status_bar: bool = True):
         start_time = time.time()
-        status_msg = f"[cyan]|INFO|{self.host_name}|{self.host}| Waiting for execute {service_name}"
-        status.start() if status else print(status_msg)
-        while self.exec_command(f'systemctl is-active {service_name}') == 'active':
-            status.update(f"{status_msg}\n{self.exec_command(f'sudo journalctl -n 20 -u {service_name}')}") if status else ...
+        msg = f"[cyan]|INFO|{self.host_name}|{self.host}| Waiting for execute {service_name}"
+        status = console.status(msg)
+        status.start() if status_bar else print(msg)
+        while self.get_service_status(service_name):
+            status.update(f"{msg}\n{self.get_service_log(service_name)}") if status_bar else ...
             time.sleep(0.5)
             if isinstance(timeout, int) and (time.time() - start_time) >= timeout:
-                raise print(f'[bold red]|WARNING|{self.host_name}|{self.host}| The service {service_name} waiting time has expired ')
+                raise SshClientException(
+                    f'[bold red]|WARNING|{self.host_name}|{self.host}| '
+                    f'The service {service_name} waiting time has expired.'
+                )
         status.stop() if status else ...
         print(
             f"[blue]{'-' * 90}\n|INFO|{self.host_name}|{self.host}|Service {service_name} log:\n{'-' * 90}\n\n"
-            f"{self.exec_command(f'sudo journalctl -n 1000 -u {service_name}')}\n{'-' * 90}"
+            f"{self.get_service_log(service_name, 1000)}\n{'-' * 90}"
         )
+
+    def get_service_log(self, service_name: str, line_num: str | int = 20) -> str:
+        return self.exec_command(f'sudo journalctl -n {line_num} -u {service_name}')
+
+    def get_service_status(self, service_name) -> bool:
+        return self.exec_command(f'systemctl is-active {service_name}') == 'active'
 
     def exec_command(self, command: str) -> str | None:
         stdin, stdout, stderr = self.client.exec_command(command)

@@ -9,12 +9,14 @@ print = console.print
 
 @dataclass(frozen=True)
 class HostData:
+    config_path: str
     project_dir: str = join(os.getcwd())
     tg_dir: str = join(os.path.expanduser('~'), '.telegram')
     tmp_dir: str = join(project_dir, 'tmp')
-    report_dir: str = join(project_dir, 'reports')
-    config_path: str = join(os.getcwd(), 'config.json')
-    custom_config: str = join(project_dir, 'custom_configs', 'custom_config.json')
+
+    @property
+    def report_dir(self):
+        return join(self.project_dir, 'reports', FileUtils.read_json(self.config_path).get('title'))
 
     @property
     def config(self):

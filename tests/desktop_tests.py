@@ -16,34 +16,42 @@ print = console.print
 
 
 class DesktopTests:
-    def __init__(self, version: str, vm_name: str, status = None, telegram: bool = False, custom_config: bool = False):
+    def __init__(
+            self,
+            version: str,
+            vm_name: str,
+            config_path: str,
+            interactive_status: bool = True,
+            telegram: bool = False,
+            custom_config: bool = False
+    ):
         self.custom_config = custom_config
         self.version = version
         self.vm_name = vm_name
         self.telegram = telegram
-        self.host = HostData()
+        self.host = HostData(config_path=config_path)
         self.report = DesktopReport(version, join(self.host.report_dir, self.version, self.vm_name))
         self.tg = Telegram(token_path=self.host.tg_token, chat_id_path=self.host.tg_chat_id, tmp_dir=self.host.tmp_dir)
-        self.test_status = status if status else None
+        self.interactive_status = console.status('') if interactive_status else None
         FileUtils.create_dir((self.host.report_dir, self.host.tmp_dir), silence=True)
         self.vm = None
 
     def run(self):
-        _virtual_machine = VirtualMachine(self.vm_name)
+        virtual_machine = VirtualMachine(self.vm_name)
         try:
-            self.vm = self._create_vm(self._run_vm(_virtual_machine))
+            self.vm = self._create_vm(self._run_vm(virtual_machine))
             self.run_script_on_vm()
         except VirtualMachinException:
             self.report.write(self.vm_name, "FAILED_CREATE_VM")
         finally:
-            _virtual_machine.stop()
+            virtual_machine.stop()
 
-    def _create_vm(self, process):
+    def _create_vm(self, running_vm: VirtualMachine):
         return LinuxData(
-            vm_process=process,
-            user=process.get_logged_user(status=self.test_status, timeout=600),
+            vm_process=running_vm,
+            user=running_vm.get_logged_user(),
             version=self.version,
-            ip=process.get_ip(),
+            ip=running_vm.get_ip(),
             name=self.vm_name,
             telegram=self.telegram,
             custom_config=self.custom_config
@@ -56,15 +64,9 @@ class DesktopTests:
         vm.set_cpus(5)
         vm.set_memory(4096)
         vm.run(headless=True)
-        vm.wait_net_up(status=self.test_status, timeout=600)
+        vm.wait_net_up(status_bar=self.interactive_status, timeout=600)
+        vm.wait_logged_user(status_bar=self.interactive_status, timeout=600)
         return vm
-
-    def merge_reports(self):
-        full_report = join(self.host.report_dir, self.version, f"{self.version}_full_report.csv")
-        FileUtils.delete(full_report, silence=True) if isfile(full_report) else ...
-        reports = FileUtils.get_paths(self.host.report_dir, name_include=f"{self.version}", extension='csv')
-        Report().merge(reports, full_report)
-        return full_report
 
     def run_script_on_vm(self):
         ssh = SshClient(self.vm.ip, self.vm.name)
@@ -81,8 +83,7 @@ class DesktopTests:
         ssh.upload_file(self.host.tg_chat_id, self.vm.tg_chat_id_file)
         ssh.upload_file(self._create_file(join(self.host.tmp_dir, 'service'), self.vm.my_service()), self.vm.my_service_path)
         ssh.upload_file(self._create_file(join(self.host.tmp_dir, 'script.sh'), self.vm.script_sh()), self.vm.script_path)
-        if self.custom_config:
-            ssh.upload_file(self.host.custom_config, self.vm.custom_config_path)
+        ssh.upload_file(self.host.config, self.vm.custom_config_path)
 
     def _start_my_service(self, ssh: SshClient):
         ssh.ssh_exec_commands(f"sudo rm /var/log/journal/*/*.journal")  # clean journal
@@ -99,7 +100,7 @@ class DesktopTests:
 
     def _wait_execute_service(self, ssh: SshClient):
         print(f"[red]{'-' * 90}\n|INFO|{self.vm.name}| Wait executing script on vm\n{'-' * 90}")
-        ssh.wait_execute_service(self.vm.my_service_name, status=self.test_status)
+        ssh.wait_execute_service(self.vm.my_service_name, status_bar=self.interactive_status)
 
     def _download_report(self, ssh: SshClient):
         print(f'[green]|INFO|Download reports dir: {self.vm.report_path}')

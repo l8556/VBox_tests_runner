@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from os.path import join
+from os.path import join, isfile
 
 from frameworks.host_control import FileUtils
 from frameworks.report import Report
@@ -19,3 +19,10 @@ class DesktopReport:
     @staticmethod
     def _writer(file_path: str, mode: str, message: list, delimiter='\t', encoding='utf-8'):
         Report.write(file_path, mode, message, delimiter, encoding)
+
+    def merge_reports(self):
+        full_report = join(self.dir, self.version, f"{self.version}_full_report.csv")
+        FileUtils.delete(full_report, silence=True) if isfile(full_report) else ...
+        reports = FileUtils.get_paths(self.dir, name_include=f"{self.version}", extension='csv')
+        Report().merge(reports, full_report)
+        return full_report
