@@ -40,7 +40,6 @@ class DesktopTests:
         virtual_machine = VirtualMachine(self.vm_name)
         try:
             self.vm = self._create_vm(self.run_vm(virtual_machine))
-            print(self.vm.script_sh())
             self.run_script_on_vm()
         except VirtualMachinException:
             self.report.write(self.vm_name, "FAILED_CREATE_VM")
