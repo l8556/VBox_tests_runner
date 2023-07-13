@@ -16,7 +16,7 @@ class VirtualMachine:
 
     def set_cpus(self, num: int):
         self._run_cmd(f"{cmd.modifyvm} {self.name} --cpus {num}")
-        print(f"[green]|INFO|{self.name} The number of processor cores is set to {num}")
+        print(f"[green]|INFO|{self.name}| The number of processor cores is set to {num}")
 
     def set_memory(self, num: int):
         self._run_cmd(f"{cmd.modifyvm} {self.name} --memory {num}")
