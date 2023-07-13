@@ -15,7 +15,7 @@ class VirtualMachine:
         self.name = vm_name
 
     def audio(self, turn: bool):
-        self._run_cmd(f"{cmd.modifyvm} {self.name} --audio {'on' if turn else 'none'}")
+        self._run_cmd(f"{cmd.modifyvm} {self.name} --audio-driver {'default' if turn else 'none'}")
         print(f"[green]|INFO|{self.name}| Audio interface is {'on' if turn else 'off'}")
 
     def set_cpus(self, num: int):
