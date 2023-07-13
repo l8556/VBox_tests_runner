@@ -13,6 +13,7 @@ class HostData:
     project_dir: str = join(os.getcwd())
     tg_dir: str = join(os.path.expanduser('~'), '.telegram')
     tmp_dir: str = join(project_dir, 'tmp')
+    lic_file: str = join(project_dir, 'test_lic.lickey')
 
     @property
     def report_dir(self):

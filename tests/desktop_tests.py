@@ -40,6 +40,7 @@ class DesktopTests:
         virtual_machine = VirtualMachine(self.vm_name)
         try:
             self.vm = self._create_vm(self.run_vm(virtual_machine))
+            print(self.vm.script_sh())
             self.run_script_on_vm()
         except VirtualMachinException:
             self.report.write(self.vm_name, "FAILED_CREATE_VM")
@@ -50,7 +51,7 @@ class DesktopTests:
         if vm.check_status():
             vm.stop()
         vm.restore_snapshot()
-        vm.set_cpus(5)
+        vm.set_cpus(4)
         vm.set_memory(4096)
         vm.audio(False)
         vm.run(headless=True)
@@ -74,6 +75,7 @@ class DesktopTests:
         ssh.upload_file(self._create_file(join(self.host.tmp_dir, 'service'), self.vm.my_service()), self.vm.my_service_path)
         ssh.upload_file(self._create_file(join(self.host.tmp_dir, 'script.sh'), self.vm.script_sh()), self.vm.script_path)
         ssh.upload_file(self.host.config_path, self.vm.custom_config_path)
+        ssh.upload_file(self.host.lic_file, self.vm.lic_file)
 
     def _start_my_service(self, ssh: SshClient):
         ssh.ssh_exec_commands(f"sudo rm /var/log/journal/*/*.journal")  # clean journal

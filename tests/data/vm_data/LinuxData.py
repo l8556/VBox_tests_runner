@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass
-from os.path import basename, splitext
+from os.path import basename, splitext, isfile
 
 from .vm_data import VmData
 
@@ -23,6 +23,7 @@ class LinuxData(VmData):
         self.services_dir = '/etc/systemd/system'
         self.my_service_name = 'myscript.service'
         self.my_service_path = f'{self.services_dir}/{self.my_service_name}'
+        self.lic_file = f"{self.script_dir}/test_lic.lickey"
 
     @property
     def start_service_commands(self) -> list:
@@ -52,6 +53,7 @@ class LinuxData(VmData):
         cd {self.script_dir}
         git clone {'-b ' if self.branch else ''}{self.branch if self.branch else ''} {self.desktop_testing_url}
         cd {self.desktop_testing_path}
+        {('mv ' + self.lic_file + ' ' + self.desktop_testing_path + '/tests/assets/' + basename(self.lic_file)) if self.custom_config else ''}
         python3 -m venv venv
         source ./venv/bin/activate
         python3 ./make_requirements.py
