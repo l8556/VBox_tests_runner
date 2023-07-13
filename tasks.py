@@ -49,7 +49,7 @@ def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=F
 def run_vm(c, name: str = '', headless=False):
     vm = VirtualMachine(Vbox().check_vm_names(name))
     vm.run(headless=headless)
-    vm.wait_net_up(status=console.status(''))
+    vm.wait_net_up(status_bar=True)
     return print(vm.get_ip()), print(vm.wait_logged_user())
 
 @task
