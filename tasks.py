@@ -24,7 +24,7 @@ def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=F
     config = join(os.getcwd(), 'custom_config.json') if custom_config else join(os.getcwd(), 'config.json')
     vm_names = [name] if name else FileUtils.read_json(config)['hosts']
     num_processes = int(processes) if processes else 1
-    msg = f"{FileUtils.read_json(config).get('title')} desktop editors tests completed on version: {version}"
+    msg = f"{FileUtils.read_json(config).get('title')} desktop editor tests completed on version: {version}"
     if num_processes > 1:
         multiprocess.run(version, Vbox().check_vm_names(vm_names), num_processes, 10)
         Telegram().send_document(
@@ -73,7 +73,7 @@ def tg(c, version=None, custom_config=False):
     config = join(os.getcwd(), 'custom_config.json') if custom_config else join(os.getcwd(), 'config.json')
     host = HostData(config_path=config)
     tg = Telegram(token_path=host.tg_token, chat_id_path=host.tg_chat_id, tmp_dir=host.tmp_dir)
-    msg = f"{FileUtils.read_json(config).get('title')} desktop editors tests completed on version: {version}"
+    msg = f"{FileUtils.read_json(config).get('title')} desktop editor tests completed on version: {version}"
     tg.send_document(
         DesktopReport(version=version, report_dir=join(HostData(config).report_dir)).merge_reports(),
         caption=msg
