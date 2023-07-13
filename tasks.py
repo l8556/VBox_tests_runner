@@ -29,7 +29,7 @@ def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=F
     if num_processes > 1:
         multiprocess.run(version, Vbox().check_vm_names(vm_names), num_processes, 10)
         Telegram().send_document(
-            DesktopReport(version=version, report_dir=join(HostData(config).report_dir, version)).merge_reports(),
+            DesktopReport(version=version, report_dir=join(HostData(config).report_dir)).merge_reports(),
             caption=msg
         )
     else:
@@ -41,7 +41,7 @@ def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=F
                 config_path=config,
                 custom_config=custom_config
             ).run()
-    full_report = DesktopReport(version=version, report_dir=join(HostData(config).report_dir, version)).merge_reports()
+    full_report = DesktopReport(version=version, report_dir=join(HostData(config).report_dir)).merge_reports()
     if not name:
         Telegram().send_document(full_report, caption=msg)
 
