@@ -14,6 +14,10 @@ class VirtualMachine:
     def __init__(self, vm_name:str):
         self.name = vm_name
 
+    def audio(self, turn: bool):
+        self._run_cmd(f"{cmd.modifyvm} {self.name} --audio {'on' if turn else 'none'}")
+        print(f"[green]|INFO|{self.name}| Audio interface is {'on' if turn else 'off'}")
+
     def set_cpus(self, num: int):
         self._run_cmd(f"{cmd.modifyvm} {self.name} --cpus {num}")
         print(f"[green]|INFO|{self.name}| The number of processor cores is set to {num}")

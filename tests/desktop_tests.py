@@ -52,6 +52,7 @@ class DesktopTests:
         vm.restore_snapshot()
         vm.set_cpus(5)
         vm.set_memory(4096)
+        vm.audio(False)
         vm.run(headless=True)
         vm.wait_net_up(status_bar=self.interactive_status, timeout=600)
         vm.wait_logged_user(status_bar=self.interactive_status, timeout=600)
