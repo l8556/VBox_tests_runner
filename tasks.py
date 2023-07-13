@@ -67,3 +67,14 @@ def vm_list(c):
 @task
 def out_info(c, name: str = ''):
     VirtualMachine(Vbox().check_vm_names(name)).out_info()
+
+@task
+def tg(c, version=None, custom_config=False):
+    config = join(os.getcwd(), 'custom_config.json') if custom_config else join(os.getcwd(), 'config.json')
+    host = HostData(config_path=config)
+    tg = Telegram(token_path=host.tg_token, chat_id_path=host.tg_chat_id, tmp_dir=host.tmp_dir)
+    msg = f"{FileUtils.read_json(config).get('title')} desktop editors tests completed on version: {version}"
+    tg.send_document(
+        DesktopReport(version=version, report_dir=join(HostData(config).report_dir)).merge_reports(),
+        caption=msg
+    )
