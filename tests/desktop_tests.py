@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-from os.path import join, isfile
+from os.path import join
 
 from frameworks.VBox import VirtualMachine
 from frameworks.VBox.virtualmachine import VirtualMachinException
 from frameworks.console import MyConsole
 from frameworks.host_control import FileUtils
-from frameworks.report import Report
 from frameworks.ssh_client.ssh_client import SshClient
 from frameworks.telegram import Telegram
 from tests.data import LinuxData, HostData
@@ -30,6 +29,7 @@ class DesktopTests:
         self.vm_name = vm_name
         self.telegram = telegram
         self.host = HostData(config_path=config_path)
+        self.config = FileUtils.read_json(self.host.config_path)
         self.report = DesktopReport(version, join(self.host.report_dir, self.version, self.vm_name))
         self.tg = Telegram(token_path=self.host.tg_token, chat_id_path=self.host.tg_chat_id, tmp_dir=self.host.tmp_dir)
         self.interactive_status = console.status('') if interactive_status else None
@@ -94,9 +94,8 @@ class DesktopTests:
         ssh.wait_execute_service(self.vm.my_service_name, status_bar=self.interactive_status)
 
     def _download_report(self, ssh: SshClient):
-        print(f'[green]|INFO|Download reports dir: {self.vm.report_path}')
         try:
-            ssh.download_dir(self.vm.report_path, self.report.dir)
+            ssh.download_dir(f"{self.vm.report_path}/{self.config.get('title')}/{self.version}", self.report.dir)
         except Exception as e:
             self.report.write(self.vm.name, "REPORT_NOT_EXISTS")
             print(f"[red]|ERROR| Can't download report from {self.vm.name}.\nError: {e}")
@@ -116,3 +115,4 @@ class DesktopTests:
             telegram=self.telegram,
             custom_config=self.custom_config
         )
+

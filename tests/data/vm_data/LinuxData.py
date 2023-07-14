@@ -14,8 +14,7 @@ class LinuxData(VmData):
         self.script_path = f'{self.home_dir}/script.sh'
         self.script_dir = f"{self.home_dir}/scripts"
         self.desktop_testing_path = f"{self.script_dir}/{splitext(basename(self.desktop_testing_url))[0]}"
-        self.venv_path = f"{self.desktop_testing_path}/.venv/bin/activate"
-        self.report_path = f'{self.desktop_testing_path}/reports/{self.version}'
+        self.report_path = f'{self.desktop_testing_path}/reports/'
         self.custom_config_path = f"{self.script_dir}/custom_config.json"
         self.tg_dir = f"{self.home_dir}/.telegram"
         self.tg_token_file = f"{self.tg_dir}/token"
