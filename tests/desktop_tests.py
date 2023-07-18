@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import signal
 from os.path import join
 
 from frameworks.VBox import VirtualMachine
@@ -12,6 +13,11 @@ from tests.tools.desktop_report import DesktopReport
 
 console = MyConsole().console
 print = console.print
+
+def handle_interrupt(signum, frame):
+    raise KeyboardInterrupt
+
+signal.signal(signal.SIGINT, handle_interrupt)
 
 
 class DesktopTests:
@@ -43,6 +49,8 @@ class DesktopTests:
             self.run_script_on_vm()
         except VirtualMachinException:
             self.report.write(self.vm_name, "FAILED_CREATE_VM")
+        except KeyboardInterrupt:
+            print("[bold red]|WARNING| Interruption by the user")
         finally:
             virtual_machine.stop()
 

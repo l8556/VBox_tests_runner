@@ -25,12 +25,10 @@ def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=F
     vm_names = [name] if name else FileUtils.read_json(config)['hosts']
     num_processes = int(processes) if processes else 1
     msg = f"{FileUtils.read_json(config).get('title')} desktop editor tests completed on version: {version}"
+    report = DesktopReport(version=version, report_dir=join(HostData(config).report_dir))
     if num_processes > 1:
         multiprocess.run(version, Vbox().check_vm_names(vm_names), num_processes, 10)
-        Telegram().send_document(
-            DesktopReport(version=version, report_dir=join(HostData(config).report_dir)).merge_reports(),
-            caption=msg
-        )
+        Telegram().send_document(report.merge_reports(HostData(config).config.get('title'), caption=msg))
     else:
         for vm in Vbox().check_vm_names(vm_names):
             DesktopTests(
@@ -40,7 +38,7 @@ def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=F
                 config_path=config,
                 custom_config=custom_config
             ).run()
-    full_report = DesktopReport(version=version, report_dir=join(HostData(config).report_dir)).merge_reports()
+    full_report = report.merge_reports(HostData(config).config.get('title'))
     if not name:
         Telegram().send_document(full_report, caption=msg)
 
