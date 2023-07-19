@@ -9,7 +9,6 @@ from frameworks.host_control import FileUtils
 
 @dataclass
 class VmData:
-    vm_process: VirtualMachine
     telegram: bool
     user: str
     ip: str
@@ -17,4 +16,4 @@ class VmData:
     version: str
     custom_config: bool
     desktop_testing_url: str = FileUtils.read_json(join(os.getcwd(), 'config.json'))['desktop_script']
-    branch: str = FileUtils.read_json(join(os.getcwd(), 'config.json'))['branch']
+    branch: str = FileUtils.read_json(join(os.getcwd(), 'config.json')).get('branch')

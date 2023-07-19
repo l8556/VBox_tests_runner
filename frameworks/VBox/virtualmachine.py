@@ -26,7 +26,7 @@ class VirtualMachine:
         self._run_cmd(f"{cmd.modifyvm} {self.name} --memory {num}")
         print(f"[green]|INFO|{self.name}| Installed RAM quantity: {num}")
 
-    def wait_logged_user(self, timeout: int = 300, status_bar: bool = True) -> None:
+    def wait_logged_user(self, timeout: int = 300, status_bar: bool = False) -> None:
         start_time = time.time()
         status_msg = f"[cyan]|INFO|{self.name}| Waiting for Logged In Users List"
         status = console.status(status_msg)
@@ -52,7 +52,7 @@ class VirtualMachine:
                 return output.split(':')[1].strip()
         return None
 
-    def wait_net_up(self, timeout: int = 300, status_bar: bool = True):
+    def wait_net_up(self, timeout: int = 300, status_bar: bool = False):
         start_time = time.time()
         msg = f"[cyan]|INFO|{self.name}| Waiting for network adapter up"
         status = console.status(msg)

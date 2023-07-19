@@ -93,7 +93,7 @@ class SshClient:
     def create_sftp_chanel(self):
         self.sftp = self.client.open_sftp()
 
-    def wait_execute_service(self, service_name: str, timeout: int = None, status_bar: bool = True):
+    def wait_execute_service(self, service_name: str, timeout: int = None, status_bar: bool = False):
         start_time = time.time()
         msg = f"[cyan]|INFO|{self.host_name}|{self.host}| Waiting for execute {service_name}"
         status = console.status(msg)

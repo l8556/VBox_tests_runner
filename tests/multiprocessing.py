@@ -13,7 +13,7 @@ def handle_interrupt(signum, frame):
 signal.signal(signal.SIGINT, handle_interrupt)
 
 def run_test(version, vm_name):
-    DesktopTests(version=version, vm_name=vm_name, interactive_status=False).run()
+    DesktopTests(version=version, vm_name=vm_name, status_bar=False).run()
 
 def run(version, vm_names: list, max_processes: int = 1, run_timeout: int | float = 0):
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_processes) as executor:

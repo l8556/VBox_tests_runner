@@ -7,8 +7,7 @@ from frameworks.VBox.virtualmachine import VirtualMachinException
 from frameworks.console import MyConsole
 from frameworks.host_control import FileUtils
 from frameworks.ssh_client.ssh_client import SshClient
-from frameworks.telegram import Telegram
-from tests.data import LinuxData, HostData
+from tests.data import LinuxData, TestData
 from tests.tools.desktop_report import DesktopReport
 
 console = MyConsole().console
@@ -21,31 +20,20 @@ signal.signal(signal.SIGINT, handle_interrupt)
 
 
 class DesktopTests:
-    def __init__(
-            self,
-            version: str,
-            vm_name: str,
-            config_path: str,
-            interactive_status: bool = True,
-            telegram: bool = False,
-            custom_config: bool = False
-    ):
-        self.custom_config = custom_config
-        self.version = version
+    def __init__(self, vm_name: str, test_data: TestData, vm_cpus: int = 4, vm_memory: int = 4096):
+        self.vm_cores = vm_cpus
+        self.vm_memory = vm_memory
+        self.data = test_data
         self.vm_name = vm_name
-        self.telegram = telegram
-        self.host = HostData(config_path=config_path)
-        self.config = FileUtils.read_json(self.host.config_path)
-        self.report = DesktopReport(version, join(self.host.report_dir, self.version, self.vm_name))
-        self.tg = Telegram(token_path=self.host.tg_token, chat_id_path=self.host.tg_chat_id, tmp_dir=self.host.tmp_dir)
-        self.interactive_status = console.status('') if interactive_status else None
-        FileUtils.create_dir((self.host.report_dir, self.host.tmp_dir), silence=True)
         self.vm = None
+        self.report = DesktopReport(self.data.version, join(self.data.report_dir, self.vm_name))
+        FileUtils.create_dir((self.data.report_dir, self.data.tmp_dir), silence=True)
 
     def run(self):
         virtual_machine = VirtualMachine(self.vm_name)
         try:
-            self.vm = self._create_vm(self.run_vm(virtual_machine))
+            self.run_vm(virtual_machine)
+            self.vm = self._create_vm_data(virtual_machine.get_logged_user(), virtual_machine.get_ip())
             self.run_script_on_vm()
         except VirtualMachinException:
             self.report.write(self.vm_name, "FAILED_CREATE_VM")
@@ -58,12 +46,12 @@ class DesktopTests:
         if vm.check_status():
             vm.stop()
         vm.restore_snapshot()
-        vm.set_cpus(4)
-        vm.set_memory(4096)
+        vm.set_cpus(self.vm_cores)
+        vm.set_memory(self.vm_memory)
         vm.audio(False)
         vm.run(headless=True)
-        vm.wait_net_up(status_bar=self.interactive_status, timeout=600)
-        vm.wait_logged_user(status_bar=self.interactive_status, timeout=600)
+        vm.wait_net_up(status_bar=self.data.status_bar, timeout=600)
+        vm.wait_logged_user(status_bar=self.data.status_bar, timeout=600)
         return vm
 
     def run_script_on_vm(self):
@@ -77,12 +65,12 @@ class DesktopTests:
         self._download_report(ssh)
 
     def _upload_files(self, ssh: SshClient):
-        ssh.upload_file(self.host.tg_token, self.vm.tg_token_file)
-        ssh.upload_file(self.host.tg_chat_id, self.vm.tg_chat_id_file)
-        ssh.upload_file(self._create_file(join(self.host.tmp_dir, 'service'), self.vm.my_service()), self.vm.my_service_path)
-        ssh.upload_file(self._create_file(join(self.host.tmp_dir, 'script.sh'), self.vm.script_sh()), self.vm.script_path)
-        ssh.upload_file(self.host.config_path, self.vm.custom_config_path)
-        ssh.upload_file(self.host.lic_file, self.vm.lic_file)
+        ssh.upload_file(self.data.tg_token, self.vm.tg_token_file)
+        ssh.upload_file(self.data.tg_chat_id, self.vm.tg_chat_id_file)
+        ssh.upload_file(self._create_file(join(self.data.tmp_dir, 'service'), self.vm.my_service()), self.vm.my_service_path)
+        ssh.upload_file(self._create_file(join(self.data.tmp_dir, 'script.sh'), self.vm.script_sh()), self.vm.script_path)
+        ssh.upload_file(self.data.config_path, self.vm.custom_config_path)
+        ssh.upload_file(self.data.lic_file, self.vm.lic_file)
 
     def _start_my_service(self, ssh: SshClient):
         ssh.ssh_exec_commands(f"sudo rm /var/log/journal/*/*.journal")  # clean journal
@@ -99,11 +87,11 @@ class DesktopTests:
 
     def _wait_execute_service(self, ssh: SshClient):
         print(f"[red]{'-' * 90}\n|INFO|{self.vm.name}| Wait executing script on vm\n{'-' * 90}")
-        ssh.wait_execute_service(self.vm.my_service_name, status_bar=self.interactive_status)
+        ssh.wait_execute_service(self.vm.my_service_name, status_bar=self.data.status_bar)
 
     def _download_report(self, ssh: SshClient):
         try:
-            ssh.download_dir(f"{self.vm.report_path}/{self.config.get('title')}/{self.version}", self.report.dir)
+            ssh.download_dir(f"{self.vm.report_path}/{self.data.config.get('title')}/{self.data.version}", self.report.dir)
         except Exception as e:
             self.report.write(self.vm.name, "REPORT_NOT_EXISTS")
             print(f"[red]|ERROR| Can't download report from {self.vm.name}.\nError: {e}")
@@ -113,14 +101,13 @@ class DesktopTests:
         FileUtils.file_writer(path, '\n'.join(line.strip() for line in text.split('\n')), newline='')
         return path
 
-    def _create_vm(self, running_vm: VirtualMachine):
+    def _create_vm_data(self, user: str, ip: str):
         return LinuxData(
-            vm_process=running_vm,
-            user=running_vm.get_logged_user(),
-            version=self.version,
-            ip=running_vm.get_ip(),
+            user=user,
+            ip=ip,
+            version=self.data.version,
             name=self.vm_name,
-            telegram=self.telegram,
-            custom_config=self.custom_config
+            telegram=self.data.telegram,
+            custom_config=self.data.custom_config_mode
         )
 
