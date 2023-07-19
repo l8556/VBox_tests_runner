@@ -92,7 +92,7 @@ class DesktopTests:
     def _download_report(self, ssh: SshClient):
         try:
             ssh.download_dir(f"{self.vm.report_path}/{self.data.config.get('title')}/{self.data.version}", self.report.dir)
-            self.report.insert_column(
+            self.report.insert_vm_name(
                 join(self.report.dir, f"{self.data.version}_{self.data.config.get('title')}_report.csv"),
                 self.vm_name
             )
