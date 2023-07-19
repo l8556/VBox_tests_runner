@@ -45,18 +45,18 @@ class DesktopReport:
             return True
         return False
 
-    def _writer(self, mode: str, message: list, delimiter='\t', encoding='utf-8'):
-        self.report.write(self.path, mode, message, delimiter, encoding)
-
-    def _write_titles(self):
-        self._writer(mode='w', message=['Os', 'Vm_name', 'Version', 'Package_name', 'Exit_code'])
-
     def send_to_tg(self, version: str, title: str, token: str, chat_id: str):
         if not isfile(self.path):
             return print(f"[red]|ERROR| Report for sending to telegram not exists: {self.path}")
         Telegram(token_path=token, chat_id_path=chat_id).send_document(
             self.path,
-            caption=f"{title} desktop editor tests completed on version: {version}\n"
-                    f"Result: {'`All tests passed`' if self.all_is_passed() else '`Some tests have errors`'}\n"
+            caption=f"{title} desktop editor tests completed on version: {version}\n\n"
+                    f"Result: {'`All tests passed`' if self.all_is_passed() else '`Some tests have errors`'}\n\n"
                     f"Number of tested Os: `{self.get_total_count_os()}`"
         )
+
+    def _writer(self, mode: str, message: list, delimiter='\t', encoding='utf-8'):
+        self.report.write(self.path, mode, message, delimiter, encoding)
+
+    def _write_titles(self):
+        self._writer(mode='w', message=['Os', 'Vm_name', 'Version', 'Package_name', 'Exit_code'])
