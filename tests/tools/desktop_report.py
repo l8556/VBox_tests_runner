@@ -27,6 +27,7 @@ class DesktopReport:
     def insert_column(path, vm_name, delimiter='\t'):
         df = pd.read_csv(path, delimiter=delimiter)
         df.insert(loc=df.columns.get_loc('Version'), column='Vm_name', value=vm_name)
+        df.to_csv(path, index=False)
 
     @staticmethod
     def _writer(file_path: str, mode: str, message: list, delimiter='\t', encoding='utf-8'):
