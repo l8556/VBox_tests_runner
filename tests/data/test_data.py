@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from os.path import join, isfile
 from frameworks.host_control import FileUtils
 from frameworks.console import MyConsole
-from frameworks.telegram import Telegram
 
 console = MyConsole().console
 print = console.print
@@ -25,10 +24,6 @@ class TestData:
     @property
     def full_report_path(self):
         return join(self.report_dir, f"{self.version}_{self.title if self.title else ''}_full_report.csv")
-
-    @property
-    def tg(self):
-        return Telegram(token_path=self.tg_token, chat_id_path=self.tg_chat_id, tmp_dir=self.tmp_dir)
 
     @property
     def title(self) -> str:

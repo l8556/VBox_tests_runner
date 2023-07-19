@@ -26,18 +26,12 @@ def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=F
     num_processes = int(processes) if processes else 1
     report = DesktopReport(report_path=data.full_report_path)
     if num_processes > 1 and not name:
-        multiprocess.run(data.version, data.vm_names, num_processes, 10)
+        return multiprocess.run(data.version, data.vm_names, num_processes, 10)
     else:
         for vm in Vbox().check_vm_names([name] if name else data.vm_names):
             DesktopTests(vm, data).run()
     report.get_full(data.version)
-    if not name:
-        data.tg.send_document(
-            data.full_report_path,
-            caption=f'''{data.complete_test_msg}\n
-Result: {'`All tests passed`' if report.all_is_passed() else '`Some tests have errors`'}\n
-Number of tested Os: `{report.get_total_count_os()}`'''
-        )
+    report.send_to_tg(data.version, data.title, data.tg_token, data.tg_chat_id) if not name else ...
 
 @task
 def run_vm(c, name: str = '', headless=False):

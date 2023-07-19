@@ -7,15 +7,16 @@ from rich import print
 
 from frameworks.decorators import singleton
 from frameworks.host_control import FileUtils
+import tempfile
 
 
-@singleton
+# @singleton
 class Telegram:
     def __init__(
             self,
             token_path: str = None,
             chat_id_path:str = None,
-            tmp_dir: str = './tmp'
+            tmp_dir: str = tempfile.gettempdir()
     ):
         self.tg_dir = join(expanduser('~'), '.telegram')
         self.token_path = token_path if token_path else join(self.tg_dir, 'token')
