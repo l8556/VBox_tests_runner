@@ -15,7 +15,7 @@ py7zr = "*"
 requests = "*"
 paramiko = "*"
 distro = "^1.8.0"
-pandas = "^2.0.2"
+pandas = "*"
 
 
 [build-system]

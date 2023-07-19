@@ -17,6 +17,20 @@ class Report:
         pd.set_option('display.max_columns', None)
         pd.set_option("expand_frame_repr", False)
 
+
+    @staticmethod
+    def total_count(df: pd.DataFrame, column_name: str) -> int:
+        return df[column_name].count()
+
+    @staticmethod
+    def value_count(df: pd.DataFrame, column_name: str) -> str:
+        return df[column_name].value_counts()
+
+    def insert_column(self, path: str, location: str, column_name: str, value: str, delimiter='\t') -> pd.DataFrame:
+        df = self.read(path, delimiter=delimiter)
+        df.insert(loc=df.columns.get_loc(location), column=column_name, value=value)
+        return df
+
     def merge(self, reports: list, result_csv_path: str, delimiter='\t') -> str | None:
         if reports:
             merge_reports = []
@@ -54,6 +68,6 @@ class Report:
             return [row for row in reader(csvfile, delimiter=delimiter)]
 
     @staticmethod
-    def save_csv(df, csv_path: str, delimiter="\t") -> str:
+    def save_csv(df: pd.DataFrame, csv_path: str, delimiter="\t") -> str:
         df.to_csv(csv_path, index=False, sep=delimiter)
         return csv_path

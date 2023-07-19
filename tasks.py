@@ -33,7 +33,14 @@ def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=F
         for vm in Vbox().check_vm_names([name] if name else test_data.vm_names):
             DesktopTests(vm, test_data).run()
     full_report = report.get_full(test_data.title)
-    test_data.tg.send_document(full_report, caption=test_data.complete_test_msg) if not name else ...
+    if not name:
+        msg = f"{test_data.complete_test_msg}\n\n" \
+              f"Result: {'`All tests passed`' if report.all_is_passed(full_report) else '`Some tests have errors`'}\n\n" \
+              f"Number of tested Os: {report.get_total_count_os(full_report)}"
+        test_data.tg.send_document(
+            full_report,
+            caption=msg
+        )
 
 @task
 def run_vm(c, name: str = '', headless=False):
