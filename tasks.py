@@ -6,8 +6,6 @@ from invoke import task
 from rich.prompt import Prompt
 from rich import print
 from frameworks.VBox import VirtualMachine, Vbox
-from frameworks.host_control import FileUtils
-from frameworks.telegram import Telegram
 from tests.data import TestData
 from tests.desktop_tests import DesktopTests
 import tests.multiprocessing as multiprocess
