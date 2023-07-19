@@ -97,7 +97,7 @@ class DesktopTests:
             if self.report.column_is_empty("Os"):
                 raise FileNotFoundError
             self.report.insert_vm_name(self.vm_name)
-        except FileExistsError | FileNotFoundError as e:
+        except (FileExistsError, FileNotFoundError) as e:
             self.report.write(self.vm.name, "REPORT_NOT_EXISTS")
             print(f"[red]|ERROR| Can't download report from {self.vm.name}.\nError: {e}")
 
