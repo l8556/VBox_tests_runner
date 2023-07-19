@@ -29,7 +29,7 @@ def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=F
     num_processes = int(processes) if processes else 1
     report = DesktopReport(version=test_data.version, report_dir=test_data.report_dir)
     if num_processes > 1 and not name:
-        multiprocess.run(test_data.version, Vbox().check_vm_names(FileUtils.read_json(config_path)['hosts']), num_processes, 10)
+        multiprocess.run(test_data.version, test_data.vm_names, num_processes, 10)
         test_data.tg.send_document(report.get_full(test_data.title, caption=test_data.complete_test_msg))
     else:
         for vm in Vbox().check_vm_names([name] if name else test_data.vm_names):
