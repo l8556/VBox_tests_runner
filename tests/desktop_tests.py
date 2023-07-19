@@ -49,7 +49,7 @@ class DesktopTests:
         vm.set_cpus(self.vm_cores)
         vm.set_memory(self.vm_memory)
         vm.audio(False)
-        vm.run(headless=True)
+        vm.run(headless=False)
         vm.wait_net_up(status_bar=self.data.status_bar, timeout=600)
         vm.wait_logged_user(status_bar=self.data.status_bar, timeout=600)
         return vm
@@ -92,6 +92,10 @@ class DesktopTests:
     def _download_report(self, ssh: SshClient):
         try:
             ssh.download_dir(f"{self.vm.report_path}/{self.data.config.get('title')}/{self.data.version}", self.report.dir)
+            self.report.insert_column(
+                join(self.report.dir, f"{self.data.version}_{self.data.config.get('title')}_report.csv"),
+                self.vm_name
+            )
         except Exception as e:
             self.report.write(self.vm.name, "REPORT_NOT_EXISTS")
             print(f"[red]|ERROR| Can't download report from {self.vm.name}.\nError: {e}")
