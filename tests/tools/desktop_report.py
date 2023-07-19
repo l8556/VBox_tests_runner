@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 from os.path import join, isfile
-import pandas as pd
+from os.path import dirname
 
 from frameworks.host_control import FileUtils
 from frameworks.report import Report
 
 
 class DesktopReport:
-    def __init__(self, version: str, report_dir: str):
+    def __init__(self, version: str, report_path: str):
         self.version = version
-        self.dir = report_dir
-        self.path = join(self.dir, f"{version}_desktop_runer_report.csv")
+        self.path = report_path
+        self.dir = dirname(self.path)
         self.report = Report()
         FileUtils.create_dir(self.dir, silence=True)
 
@@ -39,6 +39,11 @@ class DesktopReport:
             self.report.insert_column(csv_path, location='Version', column_name='Vm_name', value=vm_name),
             csv_path
         )
+
+    def column_is_empty(self, csv_path: str, column_name: str) -> bool:
+        if not self.report.read(csv_path)[column_name].count() or not isfile(csv_path):
+            return True
+        return False
 
     def _writer(self, file_path: str, mode: str, message: list, delimiter='\t', encoding='utf-8'):
         self.report.write(file_path, mode, message, delimiter, encoding)

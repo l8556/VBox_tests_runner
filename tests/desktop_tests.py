@@ -26,8 +26,11 @@ class DesktopTests:
         self.data = test_data
         self.vm_name = vm_name
         self.vm = None
-        self.report = DesktopReport(self.data.version, join(self.data.report_dir, self.vm_name))
         FileUtils.create_dir((self.data.report_dir, self.data.tmp_dir), silence=True)
+        self.report = DesktopReport(
+            self.data.version,
+            join(self.data.report_dir, self.vm_name, f"{self.data.version}_{self.data.title}_report.csv")
+        )
 
     def run(self):
         virtual_machine = VirtualMachine(self.vm_name)
@@ -91,13 +94,11 @@ class DesktopTests:
 
     def _download_report(self, ssh: SshClient):
         try:
-            ssh.download_dir(f"{self.vm.report_path}/{self.data.config.get('title')}/{self.data.version}", self.report.dir)
-            self.report.insert_vm_name(
-                join(self.report.dir, f"{self.data.version}_{self.data.config.get('title')}_report.csv"),
-                self.vm_name
-            )
+            ssh.download_dir(f"{self.vm.report_path}/{self.data.title}/{self.data.version}", self.report.dir)
+            if self.report.column_is_empty(self.report.path, "Os"):
+                raise FileNotFoundError
+            self.report.insert_vm_name(self.report.path, self.vm_name)
         except FileExistsError | FileNotFoundError as e:
-            FileUtils.delete(join(self.report.dir, f"{self.data.version}_{self.data.config.get('title')}_report.csv"))
             self.report.write(self.vm.name, "REPORT_NOT_EXISTS")
             print(f"[red]|ERROR| Can't download report from {self.vm.name}.\nError: {e}")
 
