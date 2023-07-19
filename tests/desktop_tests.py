@@ -110,4 +110,3 @@ class DesktopTests:
             telegram=self.data.telegram,
             custom_config=self.data.custom_config_mode
         )
-
