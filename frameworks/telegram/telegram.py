@@ -48,12 +48,18 @@ class Telegram:
                 tg_log=False
             )
 
-    def send_document(self, document_path: str, caption: str = '') -> None:
+    def send_document(self, document_path: str, caption: str = '', chat_id: str = None) -> None:
         if self._access:
             self._request(
                 f"https://api.telegram.org/bot{self._telegram_token}/sendDocument",
-                data={"chat_id": self._chat_id, "caption": self._prepare_caption(caption), "parse_mode": "Markdown"},
-                files={"document": open(self._prepare_documents(document_path), 'rb')}
+                data={
+                    "chat_id": chat_id if chat_id else self._chat_id,
+                    "caption": self._prepare_caption(caption),
+                    "parse_mode": "Markdown"
+                },
+                files={
+                    "document": open(self._prepare_documents(document_path), 'rb')
+                }
             )
 
     def send_media_group(self, document_paths: list, caption: str = None, media_type: str = 'document') -> None:
