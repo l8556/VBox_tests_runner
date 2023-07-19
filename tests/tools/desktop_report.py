@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from os.path import join, isfile, basename, dirname
+from os.path import join, isfile
 import pandas as pd
 
 from frameworks.host_control import FileUtils
