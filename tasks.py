@@ -34,11 +34,9 @@ def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=F
     if not name:
         test_data.tg.send_document(
             full_report,
-            caption=f'''\
-            {test_data.complete_test_msg}\n
-            Result: {'`All tests passed`' if report.all_is_passed(full_report) else '`Some tests have errors`'}\n
-            Number of tested Os: `{report.get_total_count_os(full_report)}`\
-            '''
+            caption=f'''{test_data.complete_test_msg}\n
+Result: {'`All tests passed`' if report.all_is_passed(full_report) else '`Some tests have errors`'}\n
+Number of tested Os: `{report.get_total_count_os(full_report)}`'''
         )
 
 @task

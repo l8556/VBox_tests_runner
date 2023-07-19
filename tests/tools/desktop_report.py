@@ -29,7 +29,7 @@ class DesktopReport:
         report_path = join(self.dir, f"{self.version}_{title_report if title_report else ''}_full_report.csv")
         FileUtils.delete(report_path, silence=True) if isfile(report_path) else ...
         self.report.merge(
-            FileUtils.get_paths(self.dir, name_include=f"{self.version}_{title_report}", extension='csv'),
+            FileUtils.get_paths(self.dir, name_include=f"{self.version}", extension='csv'),
             report_path
         )
         return report_path

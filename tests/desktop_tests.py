@@ -96,7 +96,8 @@ class DesktopTests:
                 join(self.report.dir, f"{self.data.version}_{self.data.config.get('title')}_report.csv"),
                 self.vm_name
             )
-        except Exception as e:
+        except FileExistsError | FileNotFoundError as e:
+            FileUtils.delete(join(self.report.dir, f"{self.data.version}_{self.data.config.get('title')}_report.csv"))
             self.report.write(self.vm.name, "REPORT_NOT_EXISTS")
             print(f"[red]|ERROR| Can't download report from {self.vm.name}.\nError: {e}")
 
