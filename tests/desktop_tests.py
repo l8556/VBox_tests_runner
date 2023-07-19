@@ -28,8 +28,7 @@ class DesktopTests:
         self.vm = None
         FileUtils.create_dir((self.data.report_dir, self.data.tmp_dir), silence=True)
         self.report = DesktopReport(
-            self.data.version,
-            join(self.data.report_dir, self.vm_name, f"{self.data.version}_{self.data.title}_report.csv")
+            join(self.data.report_dir,self.vm_name, f"{self.data.version}_{self.data.title}_report.csv")
         )
 
     def run(self):
@@ -39,7 +38,7 @@ class DesktopTests:
             self.vm = self._create_vm_data(virtual_machine.get_logged_user(), virtual_machine.get_ip())
             self.run_script_on_vm()
         except VirtualMachinException:
-            self.report.write(self.vm_name, "FAILED_CREATE_VM")
+            self.report.write(self.data.version, self.vm_name, "FAILED_CREATE_VM")
         except KeyboardInterrupt:
             print("[bold red]|WARNING| Interruption by the user")
         finally:
@@ -95,9 +94,9 @@ class DesktopTests:
     def _download_report(self, ssh: SshClient):
         try:
             ssh.download_dir(f"{self.vm.report_path}/{self.data.title}/{self.data.version}", self.report.dir)
-            if self.report.column_is_empty(self.report.path, "Os"):
+            if self.report.column_is_empty("Os"):
                 raise FileNotFoundError
-            self.report.insert_vm_name(self.report.path, self.vm_name)
+            self.report.insert_vm_name(self.vm_name)
         except FileExistsError | FileNotFoundError as e:
             self.report.write(self.vm.name, "REPORT_NOT_EXISTS")
             print(f"[red]|ERROR| Can't download report from {self.vm.name}.\nError: {e}")

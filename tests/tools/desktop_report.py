@@ -7,46 +7,44 @@ from frameworks.report import Report
 
 
 class DesktopReport:
-    def __init__(self, version: str, report_path: str):
-        self.version = version
+    def __init__(self, report_path: str):
         self.path = report_path
         self.dir = dirname(self.path)
         self.report = Report()
         FileUtils.create_dir(self.dir, silence=True)
 
-    def write(self, vm_name: str, exit_code: str):
+    def write(self, version: str, vm_name: str, exit_code: str) -> None:
         self._write_titles() if not isfile(self.path) else ...
-        self._writer(self.path, 'a', ["", vm_name, self.version, "", exit_code])
+        self._writer(mode='a', message=["", vm_name, version, "", exit_code])
 
-    def get_total_count_os(self, csv_path: str) -> int:
-        return self.report.total_count(self.report.read(csv_path), 'Os')
+    def get_total_count_os(self) -> int:
+        return self.report.total_count(self.report.read(self.path), 'Os')
 
-    def all_is_passed(self, csv_path: str) -> bool:
-        df = self.report.read(csv_path)
+    def all_is_passed(self) -> bool:
+        df = self.report.read(self.path)
         return df['Exit_code'].eq('Passed').all()
 
-    def get_full(self, title_report: str) -> str:
-        report_path = join(self.dir, f"{self.version}_{title_report if title_report else ''}_full_report.csv")
-        FileUtils.delete(report_path, silence=True) if isfile(report_path) else ...
+    def get_full(self, version: str) -> str:
+        FileUtils.delete(self.path, silence=True) if isfile(self.path) else ...
         self.report.merge(
-            FileUtils.get_paths(self.dir, name_include=f"{self.version}", extension='csv'),
-            report_path
+            FileUtils.get_paths(self.dir, name_include=f"{version}", extension='csv'),
+            self.path
         )
-        return report_path
+        return self.path
 
-    def insert_vm_name(self, csv_path: str, vm_name: str) -> None:
+    def insert_vm_name(self, vm_name: str) -> None:
         self.report.save_csv(
-            self.report.insert_column(csv_path, location='Version', column_name='Vm_name', value=vm_name),
-            csv_path
+            self.report.insert_column(self.path, location='Version', column_name='Vm_name', value=vm_name),
+            self.path
         )
 
-    def column_is_empty(self, csv_path: str, column_name: str) -> bool:
-        if not self.report.read(csv_path)[column_name].count() or not isfile(csv_path):
+    def column_is_empty(self, column_name: str) -> bool:
+        if not self.report.read(self.path)[column_name].count() or not isfile(self.path):
             return True
         return False
 
-    def _writer(self, file_path: str, mode: str, message: list, delimiter='\t', encoding='utf-8'):
-        self.report.write(file_path, mode, message, delimiter, encoding)
+    def _writer(self, mode: str, message: list, delimiter='\t', encoding='utf-8'):
+        self.report.write(self.path, mode, message, delimiter, encoding)
 
     def _write_titles(self):
-        self._writer(self.path, 'w', ['Os', 'Vm_name', 'Version', 'Package_name', 'Exit_code'])
+        self._writer(mode='w', message=['Os', 'Vm_name', 'Version', 'Package_name', 'Exit_code'])
