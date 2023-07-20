@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-import json
-import os
+from os import getcwd
+from typing import Dict
+
 from dataclasses import dataclass
-from os.path import join, isfile
+from os.path import join, isfile, expanduser
 from frameworks.host_control import FileUtils
 from frameworks.console import MyConsole
 
@@ -13,8 +14,8 @@ print = console.print
 class TestData:
     version: str
     config_path: str
-    project_dir: str = join(os.getcwd())
-    tg_dir: str = join(os.path.expanduser('~'), '.telegram')
+    project_dir: str = join(getcwd())
+    tg_dir: str = join(expanduser('~'), '.telegram')
     tmp_dir: str = join(project_dir, 'tmp')
     lic_file: str = join(project_dir, 'test_lic.lickey')
     status_bar: bool = True
@@ -22,10 +23,10 @@ class TestData:
     custom_config_mode: bool = False
 
     def __post_init__(self):
-        self.config: json = FileUtils.read_json(self.config_path)
-        self.vm_names: list = self.config['hosts']
-        self.title: str = self._title()
-        self.report_dir: str = join(self.project_dir, 'reports', self.config.get('title'), self.version)
+        self.config: Dict = self._read_config()
+        self.vm_names: list = self.config.get('hosts', [])
+        self.title: str = self.config.get('title', 'Undefined_title')
+        self.report_dir: str = join(self.project_dir, 'reports', self.title, self.version)
         self.full_report_path: str = join(self.report_dir, f"{self.version}_{self.title}_desktop_tests_report.csv")
 
     @property
@@ -48,9 +49,7 @@ class TestData:
             print(f"[red]|WARNING| Telegram Chat id from config file not exists: {file_path}")
         return join(self.tg_dir, 'chat')
 
-    def _title(self) -> str:
-        title = self.config.get('title')
-        if title:
-            return title
-        print(f"[red]|WARNING| Please fill in the title parameter in the configuration file")
-        return 'Undefined_title'
+    def _read_config(self):
+        if not isfile(self.config_path):
+            raise FileNotFoundError(f"[red]|ERROR| Configuration file not found: {self.config_path}")
+        return FileUtils.read_json(self.config_path)
