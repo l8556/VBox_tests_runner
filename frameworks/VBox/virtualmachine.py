@@ -24,6 +24,7 @@ class VirtualMachine:
         :return: None
         """
         self._run_cmd(f"{cmd.modifyvm} {self.name} --spec-ctrl {'on' if turn_on else 'off'}")
+        print(f"[green]|INFO|{self.name}| Speculative Execution Control is {'on' if turn_on else 'off'}")
 
     def audio(self, turn: bool):
         self._run_cmd(f"{cmd.modifyvm} {self.name} --audio-driver {'default' if turn else 'none'}")
