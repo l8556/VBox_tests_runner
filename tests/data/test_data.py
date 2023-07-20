@@ -21,33 +21,12 @@ class TestData:
     telegram: bool = False
     custom_config_mode: bool = False
 
-    @property
-    def full_report_path(self):
-        return join(self.report_dir, f"{self.version}_{self.title if self.title else ''}_full_report.csv")
-
-    @property
-    def title(self) -> str:
-        title = self.config.get('title')
-        if title:
-            return title
-        print(f"[red]|WARNING| Please fill in the title parameter in the configuration file")
-        return 'Undefined_title'
-
-    @property
-    def complete_test_msg(self) -> str:
-        return f"{self.config.get('title')} desktop editor tests completed on version: {self.version}"
-
-    @property
-    def vm_names(self) -> list:
-        return self.config['hosts']
-
-    @property
-    def report_dir(self) -> str:
-        return join(self.project_dir, 'reports', self.config.get('title'), self.version)
-
-    @property
-    def config(self) -> json:
-        return FileUtils.read_json(self.config_path)
+    def __post_init__(self):
+        self.config: json = FileUtils.read_json(self.config_path)
+        self.vm_names: list = self.config['hosts']
+        self.title: str = self._title()
+        self.report_dir: str = join(self.project_dir, 'reports', self.config.get('title'), self.version)
+        self.full_report_path: str = join(self.report_dir, f"{self.version}_{self.title}_desktop_tests_report.csv")
 
     @property
     def tg_token(self) -> str:
@@ -68,3 +47,10 @@ class TestData:
                 return file_path
             print(f"[red]|WARNING| Telegram Chat id from config file not exists: {file_path}")
         return join(self.tg_dir, 'chat')
+
+    def _title(self) -> str:
+        title = self.config.get('title')
+        if title:
+            return title
+        print(f"[red]|WARNING| Please fill in the title parameter in the configuration file")
+        return 'Undefined_title'

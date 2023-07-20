@@ -23,13 +23,16 @@ def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=F
         config_path=join(os.getcwd(), 'custom_config.json') if custom_config else join(os.getcwd(), 'config.json'),
         custom_config_mode=custom_config
     )
+
     num_processes = int(processes) if processes else 1
     report = DesktopReport(report_path=data.full_report_path)
+
     if num_processes > 1 and not name:
         return multiprocess.run(data.version, data.vm_names, num_processes, 10)
     else:
         for vm in Vbox().check_vm_names([name] if name else data.vm_names):
             DesktopTests(vm, data).run()
+
     report.get_full(data.version)
     report.send_to_tg(data.version, data.title, data.tg_token, data.tg_chat_id) if not name else ...
 
