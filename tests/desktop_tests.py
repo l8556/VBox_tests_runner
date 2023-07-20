@@ -48,14 +48,17 @@ class DesktopTests:
         if vm.check_status():
             vm.stop()
         vm.restore_snapshot()
-        vm.speculative_execution_control(True)
-        vm.set_cpus(self.vm_cores)
-        vm.set_memory(self.vm_memory)
-        vm.audio(False)
+        self.configurate_virtual_machine(vm)
         vm.run(headless=False)
         vm.wait_net_up(status_bar=self.data.status_bar, timeout=600)
         vm.wait_logged_user(status_bar=self.data.status_bar, timeout=600)
         return vm
+
+    def configurate_virtual_machine(self, vm: VirtualMachine) -> None:
+        vm.set_cpus(self.vm_cores)
+        vm.set_memory(self.vm_memory)
+        vm.audio(False)
+        vm.speculative_execution_control(True)
 
     def run_script_on_vm(self):
         ssh = SshClient(self.vm.ip, self.vm.name)
