@@ -9,7 +9,7 @@ from frameworks.console import MyConsole
 console = MyConsole().console
 print = console.print
 
-@dataclass(frozen=True)
+@dataclass
 class TestData:
     version: str
     config_path: str
