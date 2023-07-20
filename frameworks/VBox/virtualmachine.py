@@ -14,6 +14,17 @@ class VirtualMachine:
     def __init__(self, vm_name:str):
         self.name = vm_name
 
+    def speculative_execution_control(self, turn_on: bool = True):
+        """
+        Speculative Execution Control is a mechanism
+        used to reduce the vulnerability of Spectre and Meltdown at the level of the host operating system.
+        Spectre and Meltdown are vulnerabilities associated with the use of speculative execution by processors,
+        which can lead to potential data leaks.
+        :param turn_on: True or False
+        :return: None
+        """
+        self._run_cmd(f"{cmd.modifyvm} {self.name} --spec-ctrl {'on' if turn_on else 'off'}")
+
     def audio(self, turn: bool):
         self._run_cmd(f"{cmd.modifyvm} {self.name} --audio-driver {'default' if turn else 'none'}")
         print(f"[green]|INFO|{self.name}| Audio interface is {'on' if turn else 'off'}")
