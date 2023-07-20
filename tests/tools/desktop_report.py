@@ -19,8 +19,8 @@ class DesktopReport:
         self._write_titles() if not isfile(self.path) else ...
         self._writer(mode='a', message=["", vm_name, version, "", exit_code])
 
-    def get_total_count_os(self) -> int:
-        return self.report.total_count(self.report.read(self.path), 'Os')
+    def get_total_count(self, column_name: str) -> int:
+        return self.report.total_count(self.report.read(self.path), column_name)
 
     def all_is_passed(self) -> bool:
         df = self.report.read(self.path)
@@ -52,7 +52,7 @@ class DesktopReport:
             self.path,
             caption=f"{title} desktop editor tests completed on version: {version}\n\n"
                     f"Result: {'`All tests passed`' if self.all_is_passed() else '`Some tests have errors`'}\n\n"
-                    f"Number of tested Os: `{self.get_total_count_os()}`"
+                    f"Number of tested Os: `{self.get_total_count('Exit_code')}`"
         )
 
     def _writer(self, mode: str, message: list, delimiter='\t', encoding='utf-8'):
