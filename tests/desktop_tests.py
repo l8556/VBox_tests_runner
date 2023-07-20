@@ -48,6 +48,7 @@ class DesktopTests:
         if vm.check_status():
             vm.stop()
         vm.restore_snapshot()
+        vm.speculative_execution_control(True)
         vm.set_cpus(self.vm_cores)
         vm.set_memory(self.vm_memory)
         vm.audio(False)
