@@ -107,7 +107,7 @@ class SshClient:
                     f'[bold red]|WARNING|{self.host_name}|{self.host}| '
                     f'The service {service_name} waiting time has expired.'
                 )
-        status.stop() if status else ...
+        status.stop() if status_bar else ...
         print(
             f"[blue]{'-' * 90}\n|INFO|{self.host_name}|{self.host}|Service {service_name} log:\n{'-' * 90}\n\n"
             f"{self.get_service_log(service_name, 1000)}\n{'-' * 90}"
