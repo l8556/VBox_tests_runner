@@ -129,11 +129,12 @@ class VirtualMachine:
     def restore_snapshot(self, name: str = None) -> None:
         print(f"[green]|INFO|{self.name}| Restoring snapshot: {name if name else self.snapshot_list()[-1].strip()}")
         self._run_cmd(f"{cmd.snapshot} {self.name} {f'restore {name}' if name else 'restorecurrent'}")
+        time.sleep(1) # todo
 
     def stop(self):
         print(f"[green]|INFO|{self.name}| Shutting down the virtual machine")
         self._run_cmd(f'{cmd.controlvm} {self.name} poweroff')
-        time.sleep(5)
+        time.sleep(5)  # todo
 
     def out_info(self):
         self._run_cmd(f'{cmd.enumerate} {self.name}')
