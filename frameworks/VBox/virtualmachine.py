@@ -52,6 +52,7 @@ class VirtualMachine:
                 break
             time.sleep(1)
         else:
+            status.stop() if status_bar else ...
             raise VirtualMachinException(
                 f"[red]|ERROR|{self.name}| Waiting time for the virtual machine {self.name} "
                 f"Logged In Users List has expired"
@@ -78,6 +79,7 @@ class VirtualMachine:
                 break
             time.sleep(1)
         else:
+            status.stop() if status_bar else ...
             raise VirtualMachinException(
                 f"[red]|ERROR|{self.name}| Waiting time for the virtual machine network adapter to start has expired"
             )

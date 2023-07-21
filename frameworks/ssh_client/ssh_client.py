@@ -102,6 +102,7 @@ class SshClient:
             status.update(f"{msg}\n{self.get_service_log(service_name)}") if status_bar else ...
             time.sleep(0.5)
             if isinstance(timeout, int) and (time.time() - start_time) >= timeout:
+                status.stop() if status_bar else ...
                 raise SshClientException(
                     f'[bold red]|WARNING|{self.host_name}|{self.host}| '
                     f'The service {service_name} waiting time has expired.'
