@@ -38,6 +38,7 @@ class DesktopTests:
             self.vm = self._create_vm_data(virtual_machine.get_logged_user(), virtual_machine.get_ip())
             self.run_script_on_vm()
         except VirtualMachinException:
+            print(f"[bold red]|ERROR|{self.vm.name}| Failed to create  a virtual machine")
             self.report.write(self.data.version, self.vm_name, "FAILED_CREATE_VM")
         except KeyboardInterrupt:
             print("[bold red]|WARNING| Interruption by the user")
