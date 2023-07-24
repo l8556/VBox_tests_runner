@@ -204,6 +204,14 @@ class VirtualMachine:
         self._run_cmd(f"{cmd.snapshot} {self.name} {f'restore {name}' if name else 'restorecurrent'}")
         time.sleep(1) # todo
 
+    def delete_snapshot(self, name: str) -> None:
+        self._run_cmd(f"{cmd.snapshot} {self.name} delete {name}")
+        print(f"[green]|INFO| Snapshot {name} deleted.")
+
+    def rename_snapshot(self, old_name: str, new_name: str) -> None:
+        self._run_cmd(f"{cmd.snapshot} {self.name} edit {old_name} --name {new_name}")
+        print(f"[green]|INFO| Snapshot {old_name} has been renamed to {new_name}")
+
     def stop(self):
         print(f"[green]|INFO|{self.name}| Shutting down the virtual machine")
         self._run_cmd(f'{cmd.controlvm} {self.name} poweroff')
