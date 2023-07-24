@@ -22,7 +22,6 @@ class VirtualMachine:
             adapter_name: str = None
     ) -> None:
         """
-
         :param adapter_name:
         :param turn:
         :param adapter_number:
@@ -33,10 +32,15 @@ class VirtualMachine:
             raise VirtualMachinException(
                 f"[red]|ERROR| Please enter correct connection type: nat, bridged, intnet, hostonly"
             )
+
+        def _get_name():
+            if adapter_name and turn and connect_type.lower() == 'bridged':
+                return f"--bridgeadapter{adapter_number} {adapter_name}"
+            return ''
+
         self._run_cmd(
             f"{cmd.modifyvm} {self.name} "
-            f"--nic{adapter_number} {connect_type.lower() if turn else 'none'} "
-            f"{('--bridgeadapter' + adapter_number + ' adapter_name') if adapter_name and turn else ''}".strip()
+            f"--nic{adapter_number} {connect_type.lower() if turn else 'none'} {_get_name()}".strip()
         )
 
     def copy(self, path_from: str, path_to: str, username: str, password: str) -> None:
