@@ -76,17 +76,12 @@ class DesktopTests:
     def _upload_files(self, ssh: SshClient):
         service = self._create_file(join(self.data.tmp_dir, 'service'), self.vm.my_service())
         script = self._create_file(join(self.data.tmp_dir, 'script.sh'), self.vm.script_sh())
-        self._upload(ssh, self.data.tg_token, self.vm.tg_token_file)
-        self._upload(ssh, self.data.tg_chat_id, self.vm.tg_chat_id_file)
-        self._upload(ssh, service, self.vm.my_service_path)
-        self._upload(ssh, script, self.vm.script_path)
-        self._upload(ssh, self.data.config_path, self.vm.custom_config_path)
-        self._upload(ssh, self.data.lic_file, self.vm.lic_file)
-
-    @staticmethod
-    def _upload(ssh: SshClient, file_from: str, file_to: str):
-        if exists(file_from):
-            ssh.upload_file(file_from, file_to)
+        ssh.upload_file(self.data.tg_token, self.vm.tg_token_file)
+        ssh.upload_file(self.data.tg_chat_id, self.vm.tg_chat_id_file)
+        ssh.upload_file(service, self.vm.my_service_path)
+        ssh.upload_file(script, self.vm.script_path)
+        ssh.upload_file(self.data.config_path, self.vm.custom_config_path)
+        ssh.upload_file(self.data.lic_file, self.vm.lic_file)
 
     @staticmethod
     def _create_file(path: str, text: str) -> str:

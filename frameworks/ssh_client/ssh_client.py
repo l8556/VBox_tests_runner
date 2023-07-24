@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import time
-from os.path import basename, join
+from os.path import basename, join, exists
 import paramiko
 from paramiko.client import SSHClient
 from frameworks.console import MyConsole
@@ -59,13 +59,16 @@ class SshClient:
 
     def upload_file(self, local, remote):
         if self.sftp:
-            print(f'[green]|INFO|{self.host_name}|{self.host}| Upload file: {basename(local)} to {remote}')
-            self.sftp.putfo(open(local, 'rb'), remote)
-            local_file_size = os.stat(local).st_size
-            while True:
-                remote_file_size = self.sftp.stat(remote).st_size
-                if remote_file_size == local_file_size:
-                    break
+            if exists(local):
+                print(f'[green]|INFO|{self.host_name}|{self.host}| Upload file: {basename(local)} to {remote}')
+                self.sftp.putfo(open(local, 'rb'), remote)
+                local_file_size = os.stat(local).st_size
+                while True:
+                    remote_file_size = self.sftp.stat(remote).st_size
+                    if remote_file_size == local_file_size:
+                        break
+            else:
+                print(f"[cyan]|INFO|{self.host_name}| Local file not exists: {local}")
         else:
             raise SshClientException(f'[red]|WARNING|{self.host_name}|{self.host}| Sftp chanel not created.')
 
