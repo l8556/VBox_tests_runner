@@ -8,7 +8,9 @@ from ..console import MyConsole
 console = MyConsole().console
 print = console.print
 
+
 class VirtualMachinException(Exception): ...
+
 
 class VirtualMachine:
     def __init__(self, vm_name: str):
@@ -48,6 +50,16 @@ class VirtualMachine:
             f'{("adapter name: " + _get_name()) if _get_name() else ""}'.strip()
         )
 
+    def send_shutdown_signal(self):
+        self._run_cmd(f"{cmd.controlvm} {self.name} acpipowerbutton")
+
+    def wait_until_shutdown(self, timeout: int = 120) -> bool:
+        for _ in range(timeout):
+            if self.check_status() is False:
+                return True
+            time.sleep(1)
+        return False
+
     def adapter_list(self):
         return self._run_cmd(f"{cmd.vboxmanage} list bridgedifs")
 
@@ -65,7 +77,7 @@ class VirtualMachine:
             f"--wait-stdout -- /bin/mkdir {path}"
         )
 
-    def change_guest_password(self, new_password: str, username: str,  password: str) -> None:
+    def change_guest_password(self, new_password: str, username: str, password: str) -> None:
         self._run_cmd(
             f"{cmd.guestcontrol} {self.name} run "
             f"--username {username} --password {password} "
@@ -192,17 +204,14 @@ class VirtualMachine:
                 print(f"[red]|INFO|{self.name}| Unable to determine virtual machine status")
 
     def get_parameter_info(self, parameter: str) -> str | None:
-        for line in self.get_full_info().split('\n'):
+        for line in self.get_info(full=True).split('\n'):
             if line.lower().startswith(f"{parameter.lower()}="):
                 return line.strip().split('=', 1)[1].strip().replace("\"", '')
-
-    def get_full_info(self) -> str:
-        return getoutput(f"{cmd.showvminfo} {self.name} --machinereadable")
 
     def restore_snapshot(self, name: str = None) -> None:
         print(f"[green]|INFO|{self.name}| Restoring snapshot: {name if name else self.snapshot_list()[-1].strip()}")
         self._run_cmd(f"{cmd.snapshot} {self.name} {f'restore {name}' if name else 'restorecurrent'}")
-        time.sleep(1) # todo
+        time.sleep(1)  # todo
 
     def delete_snapshot(self, name: str) -> None:
         self._run_cmd(f"{cmd.snapshot} {self.name} delete {name}")
@@ -217,8 +226,10 @@ class VirtualMachine:
         self._run_cmd(f'{cmd.controlvm} {self.name} poweroff')
         time.sleep(5)  # todo
 
-    def out_info(self):
-        self._run_cmd(f'{cmd.enumerate} {self.name}')
+    def get_info(self, full: bool = False) -> str:
+        if full:
+            return getoutput(f"{cmd.showvminfo} {self.name} --machinereadable")
+        return getoutput(f'{cmd.enumerate} {self.name}')
 
     @staticmethod
     def _run_cmd(command):

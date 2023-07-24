@@ -58,4 +58,4 @@ def vm_list(c):
 
 @task
 def out_info(c, name: str = ''):
-    VirtualMachine(Vbox().check_vm_names(name)).out_info()
+    print(VirtualMachine(Vbox().check_vm_names(name)).get_info())
