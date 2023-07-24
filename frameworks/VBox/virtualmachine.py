@@ -25,7 +25,7 @@ class VirtualMachine:
     def mkdir(self, path: str, username: str, password: str) -> None:
         self._run_cmd(
             f"{cmd.guestcontrol} {self.name} "
-            f"execute --image '/bin/bash' "
+            f"run "
             f"--username {username} "
             f"--password {password} "
             f"--wait-stdout -- /bin/mkdir {path}"
@@ -34,7 +34,7 @@ class VirtualMachine:
     def change_guest_password(self, new_password: str, username: str,  password: str) -> None:
         self._run_cmd(
             f"{cmd.guestcontrol} {self.name} "
-            f"execute --image '/bin/bash' "
+            f"run "
             f"--username {username} "
             f"--password {password} "
             f"--wait-stdout -- /bin/bash -c 'echo '{new_password}' | passwd --stdin {username}'"
@@ -43,7 +43,7 @@ class VirtualMachine:
     def delete(self, path: str, username: str, password: str):
         self._run_cmd(
             f"{cmd.guestcontrol} {self.name} "
-            f"execute --image '/bin/bash' "
+            f"run "
             f"--username {username} "
             f"--password {password} "
             f"--wait-stdout -- /bin/rm -rf {path}"
