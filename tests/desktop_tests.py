@@ -52,7 +52,7 @@ class DesktopTests:
             vm.stop()
         vm.restore_snapshot()
         self.configurate_virtual_machine(vm)
-        vm.run(headless=False)
+        vm.run(headless=True)
         vm.wait_net_up(status_bar=self.data.status_bar, timeout=600)
         vm.wait_logged_user(status_bar=self.data.status_bar, timeout=600)
         return vm
