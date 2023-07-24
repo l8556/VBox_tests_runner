@@ -35,13 +35,16 @@ class VirtualMachine:
 
         def _get_name():
             if adapter_name and turn and connect_type.lower() == 'bridged':
-                return f"--bridgeadapter{adapter_number} {adapter_name}"
+                return f"--bridgeadapter{adapter_number} \"{adapter_name}\""
             return ''
 
         self._run_cmd(
             f"{cmd.modifyvm} {self.name} "
             f"--nic{adapter_number} {connect_type.lower() if turn else 'none'} {_get_name()}".strip()
         )
+
+    def adapter_list(self):
+        return self._run_cmd(f"{cmd.vboxmanage} list bridgedifs")
 
     def copy(self, path_from: str, path_to: str, username: str, password: str) -> None:
         self._run_cmd(
