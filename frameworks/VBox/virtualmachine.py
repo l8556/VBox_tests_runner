@@ -42,6 +42,11 @@ class VirtualMachine:
             f"{cmd.modifyvm} {self.name} "
             f"--nic{adapter_number} {connect_type.lower() if turn else 'none'} {_get_name()}".strip()
         )
+        print(
+            f'[green]|INFO| Network adapter is turn {"on" if turn else "off"} '
+            f'{("in " + connect_type.lower() + " mode") if turn else ""}'
+            f'{("adapter name: " + _get_name()) if _get_name() else ""}'.strip()
+        )
 
     def adapter_list(self):
         return self._run_cmd(f"{cmd.vboxmanage} list bridgedifs")
