@@ -13,3 +13,4 @@ class Commands:
     guestproperty: str = f"{vboxmanage} guestproperty get"
     wait: str = f'{vboxmanage} guestproperty wait'
     enumerate: str = f'{vboxmanage} guestproperty enumerate'
+    guestcontrol: str = f'{vboxmanage} guestcontrol'

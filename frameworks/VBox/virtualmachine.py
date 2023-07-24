@@ -14,6 +14,14 @@ class VirtualMachine:
     def __init__(self, vm_name:str):
         self.name = vm_name
 
+    def copy(self, path_from: str, path_to: str, login: str, password: str) -> None:
+        self._run_cmd(
+            f"{cmd.guestcontrol} {self.name} copyto "
+            f"--username {login} "
+            f"--password {password} "
+            f"--target-directory {path_to} {path_from}"
+        )
+
     def speculative_execution_control(self, turn_on: bool = True):
         """
         Speculative Execution Control is a mechanism
