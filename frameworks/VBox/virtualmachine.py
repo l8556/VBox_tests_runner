@@ -54,8 +54,10 @@ class VirtualMachine:
         self._run_cmd(f"{cmd.controlvm} {self.name} acpipowerbutton")
 
     def wait_until_shutdown(self, timeout: int = 120) -> bool:
+        print(f"[green]|INFO|{self.name}| Waiting until shutdown.")
         for _ in range(timeout):
             if self.check_status() is False:
+                print(f"[green]|INFO|{self.name}| Is Power Off.")
                 return True
             time.sleep(1)
         return False
@@ -224,7 +226,7 @@ class VirtualMachine:
     def stop(self):
         print(f"[green]|INFO|{self.name}| Shutting down the virtual machine")
         self._run_cmd(f'{cmd.controlvm} {self.name} poweroff')
-        time.sleep(5)  # todo
+        self.wait_until_shutdown()
 
     def get_info(self, full: bool = False) -> str:
         if full:

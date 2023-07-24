@@ -15,8 +15,10 @@ from tests.tools.desktop_report import DesktopReport
 console = MyConsole().console
 print = console.print
 
+
 @task
-def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=False, custom_config=False, headless=False):
+def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=False, custom_config=False,
+                 headless=False):
     data = TestData(
         version=version if version else Prompt.ask('[red]Please enter version'),
         telegram=detailed_telegram,
@@ -36,6 +38,7 @@ def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=F
     report.get_full(data.version)
     report.send_to_tg(data.version, data.title, data.tg_token, data.tg_chat_id) if not name else ...
 
+
 @task
 def run_vm(c, name: str = '', headless=False):
     vm = VirtualMachine(Vbox().check_vm_names(name))
@@ -43,6 +46,7 @@ def run_vm(c, name: str = '', headless=False):
     vm.wait_net_up(status_bar=True)
     vm.wait_logged_user(status_bar=True)
     return print(vm.get_ip()), print(vm.get_logged_user())
+
 
 @task
 def stop_vm(c, name: str = '', all: bool = False):
@@ -52,9 +56,11 @@ def stop_vm(c, name: str = '', all: bool = False):
         return
     VirtualMachine(Vbox().check_vm_names(name)).stop()
 
+
 @task
 def vm_list(c):
     print(Vbox.vm_list())
+
 
 @task
 def out_info(c, name: str = ''):
