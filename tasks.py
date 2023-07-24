@@ -50,9 +50,8 @@ def run_vm(c, name: str = '', headless=False):
 @task
 def stop_vm(c, name: str = '', all: bool = False):
     if all:
-        for vm in Vbox.vm_list():
-            VirtualMachine(vm).stop()
-        return
+        for vm in [line.split('"')[1] for line in Vbox.vm_list()]:
+            return VirtualMachine(vm).stop()
     VirtualMachine(Vbox().check_vm_names(name)).stop()
 
 
