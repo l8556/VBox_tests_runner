@@ -5,6 +5,7 @@ from os.path import join
 from frameworks.VBox import VirtualMachine
 from frameworks.VBox.virtualmachine import VirtualMachinException
 from frameworks.console import MyConsole
+from frameworks.decorators import retry
 from frameworks.host_control import FileUtils
 from frameworks.ssh_client.ssh_client import SshClient
 from tests.data import LinuxData, TestData
@@ -27,10 +28,9 @@ class DesktopTests:
         self.vm_name = vm_name
         self.vm = None
         FileUtils.create_dir((self.data.report_dir, self.data.tmp_dir), silence=True)
-        self.report = DesktopReport(
-            join(self.data.report_dir,self.vm_name, f"{self.data.version}_{self.data.title}_report.csv")
-        )
+        self.report = self._create_report()
 
+    @retry(max_attempts=2, exception_type=VirtualMachinException)
     def run(self):
         virtual_machine = VirtualMachine(self.vm_name)
         try:
@@ -38,7 +38,7 @@ class DesktopTests:
             self.vm = self._create_vm_data(virtual_machine.get_logged_user(), virtual_machine.get_ip())
             self.run_script_on_vm()
         except VirtualMachinException:
-            print(f"[bold red]|ERROR|{self.vm.name}| Failed to create  a virtual machine")
+            print(f"[bold red]|ERROR|{self.vm_name}| Failed to create  a virtual machine")
             self.report.write(self.data.version, self.vm_name, "FAILED_CREATE_VM")
         except KeyboardInterrupt:
             print("[bold red]|WARNING| Interruption by the user")
@@ -79,6 +79,11 @@ class DesktopTests:
         ssh.upload_file(self.data.config_path, self.vm.custom_config_path)
         ssh.upload_file(self.data.lic_file, self.vm.lic_file)
 
+    @staticmethod
+    def _create_file(path: str, text: str) -> str:
+        FileUtils.file_writer(path, '\n'.join(line.strip() for line in text.split('\n')), newline='')
+        return path
+
     def _start_my_service(self, ssh: SshClient):
         ssh.ssh_exec_commands(f"sudo rm /var/log/journal/*/*.journal")  # clean journal
         ssh.ssh_exec_commands(self.vm.start_service_commands)
@@ -103,13 +108,8 @@ class DesktopTests:
                 raise FileNotFoundError
             self.report.insert_vm_name(self.vm_name)
         except (FileExistsError, FileNotFoundError) as e:
-            self.report.write(self.vm.name, "REPORT_NOT_EXISTS")
+            self.report.write(self.data.version, self.vm.name, "REPORT_NOT_EXISTS")
             print(f"[red]|ERROR| Can't download report from {self.vm.name}.\nError: {e}")
-
-    @staticmethod
-    def _create_file(path: str, text: str) -> str:
-        FileUtils.file_writer(path, '\n'.join(line.strip() for line in text.split('\n')), newline='')
-        return path
 
     def _create_vm_data(self, user: str, ip: str):
         return LinuxData(
@@ -119,4 +119,13 @@ class DesktopTests:
             name=self.vm_name,
             telegram=self.data.telegram,
             custom_config=self.data.custom_config_mode
+        )
+
+    def _create_report(self):
+        return DesktopReport(
+            join(
+                self.data.report_dir,
+                self.vm_name,
+                f"{self.data.version}_{self.data.title}_report.csv"
+            )
         )

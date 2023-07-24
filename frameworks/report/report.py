@@ -28,7 +28,10 @@ class Report:
 
     def insert_column(self, path: str, location: str, column_name: str, value: str, delimiter='\t') -> pd.DataFrame:
         df = self.read(path, delimiter=delimiter)
-        df.insert(loc=df.columns.get_loc(location), column=column_name, value=value)
+        if column_name  not in df.columns:
+            df.insert(loc=df.columns.get_loc(location), column=column_name, value=value)
+        else:
+            print(f"[green]|INFO| Column `{column_name}` already exists in `{path}`")
         return df
 
     def merge(self, reports: list, result_csv_path: str, delimiter='\t') -> str | None:
