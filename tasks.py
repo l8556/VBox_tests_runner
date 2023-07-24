@@ -17,8 +17,7 @@ print = console.print
 
 
 @task
-def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=False, custom_config=False,
-                 headless=False):
+def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=False, custom_config=False, headless=False):
     data = TestData(
         version=version if version else Prompt.ask('[red]Please enter version'),
         telegram=detailed_telegram,
