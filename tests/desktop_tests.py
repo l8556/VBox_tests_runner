@@ -33,10 +33,10 @@ class DesktopTests:
         self.report = self._create_report()
 
     @retry(max_attempts=2, exception_type=VirtualMachinException)
-    def run(self):
+    def run(self, headless: bool = True):
         virtual_machine = VirtualMachine(self.vm_name)
         try:
-            self.run_vm(virtual_machine)
+            self.run_vm(virtual_machine, headless=True)
             self.vm = self._create_vm_data(virtual_machine.get_logged_user(), virtual_machine.get_ip())
             self.run_script_on_vm()
         except VirtualMachinException:
@@ -47,12 +47,12 @@ class DesktopTests:
         finally:
             virtual_machine.stop()
 
-    def run_vm(self, vm: VirtualMachine) -> VirtualMachine:
+    def run_vm(self, vm: VirtualMachine, headless: bool = True) -> VirtualMachine:
         if vm.check_status():
             vm.stop()
         vm.restore_snapshot()
         self.configurate_virtual_machine(vm)
-        vm.run(headless=True)
+        vm.run(headless=headless)
         vm.wait_net_up(status_bar=self.data.status_bar, timeout=600)
         vm.wait_logged_user(status_bar=self.data.status_bar, timeout=600)
         return vm

@@ -16,7 +16,7 @@ console = MyConsole().console
 print = console.print
 
 @task
-def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=False, custom_config=False):
+def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=False, custom_config=False, headless=False):
     data = TestData(
         version=version if version else Prompt.ask('[red]Please enter version'),
         telegram=detailed_telegram,
@@ -31,7 +31,7 @@ def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=F
         return multiprocess.run(data.version, data.vm_names, num_processes, 10)
     else:
         for vm in Vbox().check_vm_names([name] if name else data.vm_names):
-            DesktopTests(vm, data).run()
+            DesktopTests(vm, data).run(headless=False if headless else True)
 
     report.get_full(data.version)
     report.send_to_tg(data.version, data.title, data.tg_token, data.tg_chat_id) if not name else ...
