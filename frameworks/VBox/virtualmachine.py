@@ -14,12 +14,39 @@ class VirtualMachine:
     def __init__(self, vm_name:str):
         self.name = vm_name
 
-    def copy(self, path_from: str, path_to: str, login: str, password: str) -> None:
+    def copy(self, path_from: str, path_to: str, username: str, password: str) -> None:
         self._run_cmd(
             f"{cmd.guestcontrol} {self.name} copyto "
-            f"--username {login} "
+            f"--username {username} "
             f"--password {password} "
             f"--target-directory {path_to} {path_from}"
+        )
+
+    def mkdir(self, path: str, username: str, password: str) -> None:
+        self._run_cmd(
+            f"{cmd.guestcontrol} {self.name} "
+            f"execute --image '/bin/bash' "
+            f"--username {username} "
+            f"--password {password} "
+            f"--wait-stdout -- /bin/mkdir {path}"
+        )
+
+    def change_guest_password(self, new_password: str, username: str,  password: str) -> None:
+        self._run_cmd(
+            f"{cmd.guestcontrol} {self.name} "
+            f"execute --image '/bin/bash' "
+            f"--username {username} "
+            f"--password {password} "
+            f"--wait-stdout -- /bin/bash -c 'echo '{new_password}' | passwd --stdin {username}'"
+        )
+
+    def delete(self, path: str, username: str, password: str):
+        self._run_cmd(
+            f"{cmd.guestcontrol} {self.name} "
+            f"execute --image '/bin/bash' "
+            f"--username {username} "
+            f"--password {password} "
+            f"--wait-stdout -- /bin/rm -rf {path}"
         )
 
     def speculative_execution_control(self, turn_on: bool = True):
