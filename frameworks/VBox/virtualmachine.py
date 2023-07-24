@@ -11,42 +11,43 @@ print = console.print
 class VirtualMachinException(Exception): ...
 
 class VirtualMachine:
-    def __init__(self, vm_name:str):
+    def __init__(self, vm_name: str):
         self.name = vm_name
 
     def copy(self, path_from: str, path_to: str, username: str, password: str) -> None:
         self._run_cmd(
             f"{cmd.guestcontrol} {self.name} copyto "
-            f"--username {username} "
-            f"--password {password} "
+            f"--username {username} --password {password} "
             f"--target-directory {path_to} {path_from}"
         )
 
     def mkdir(self, path: str, username: str, password: str) -> None:
         self._run_cmd(
-            f"{cmd.guestcontrol} {self.name} "
-            f"run "
-            f"--username {username} "
-            f"--password {password} "
+            f"{cmd.guestcontrol} {self.name} run "
+            f"--username {username} --password {password} "
             f"--wait-stdout -- /bin/mkdir {path}"
         )
 
     def change_guest_password(self, new_password: str, username: str,  password: str) -> None:
         self._run_cmd(
-            f"{cmd.guestcontrol} {self.name} "
-            f"run "
-            f"--username {username} "
-            f"--password {password} "
-            f"--wait-stdout -- /bin/bash -c 'echo '{new_password}' | passwd --stdin {username}'"
+            f"{cmd.guestcontrol} {self.name} run "
+            f"--username {username} --password {password} "
+            f"--wait-stdout -- /bin/bash -c "
+            f"\"echo -e '{password}\\n{new_password}\\n{new_password}' | passwd {username}\""
         )
 
     def delete(self, path: str, username: str, password: str):
         self._run_cmd(
-            f"{cmd.guestcontrol} {self.name} "
-            f"run "
-            f"--username {username} "
-            f"--password {password} "
+            f"{cmd.guestcontrol} {self.name} run "
+            f"--username {username} --password {password} "
             f"--wait-stdout -- /bin/rm -rf {path}"
+        )
+
+    def run_cmd(self, command: str, username: str, password: str):
+        self._run_cmd(
+            f"{cmd.guestcontrol} {self.name} run "
+            f"--username {username} --password {password} "
+            f"--wait-stdout -- /bin/bash -c '{command}'"
         )
 
     def speculative_execution_control(self, turn_on: bool = True):
