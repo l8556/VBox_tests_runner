@@ -44,6 +44,7 @@ class DesktopTests:
             self.report.write(self.data.version, self.vm_name, "FAILED_CREATE_VM")
         except KeyboardInterrupt:
             print("[bold red]|WARNING| Interruption by the user")
+            raise
         finally:
             virtual_machine.stop()
 
