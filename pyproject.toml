@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "vbox-control"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "vbox_control"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+invoke = "*"
+rich = "*"
+psutil = "*"
+py7zr = "*"
+requests = "*"
+paramiko = "*"
+distro = "^1.8.0"
+pandas = "*"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
