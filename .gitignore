@@ -1,0 +1,6 @@
+/reports/
+/tmp/
+/custom_configs/*
+/custom_config.json
+/lic_file/*
+/test_lic.lickey
