@@ -12,9 +12,9 @@ print = console.print
 class SshClientException(Exception): ...
 
 class SshClient:
-    def __init__(self, host: str, host_name: str = None):
-        self.host_name = host_name if host_name else ''
-        self.host = host
+    def __init__(self, ip: str, name: str = None):
+        self.host_name = name if name else ''
+        self.host = ip
         self.client = SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.ssh = None
@@ -39,25 +39,25 @@ class SshClient:
 
             except paramiko.AuthenticationException:
                 print(f'[red]|ERROR|{self.host_name}|{self.host}| Authentication failed. Waiting and retrying...')
-                time.sleep(3)
+                time.sleep(1)
                 continue
             except paramiko.SSHException as e:
                 print(f'[red]|ERROR|{self.host_name}|{self.host}| SSH error: {e}. Waiting and retrying...')
-                time.sleep(3)
+                time.sleep(1)
                 continue
-            except Exception as e:
+            except ConnectionError as e:
                 print(
-                    f"[red]|ERROR|{self.host_name}|{self.host}| "
-                    f"Failed to connect: {username}@{self.host}.\nWaiting and retrying..."
+                    f"[red]|ERROR|{self.host_name}|{self.host}| {e} "
+                    f"Failed to connect: {username}.\nWaiting and retrying..."
                 )
-                time.sleep(3)
+                time.sleep(1)
                 continue
 
     def close_sftp_chanel(self):
         if self.sftp:
             self.sftp.close()
 
-    def upload_file(self, local, remote):
+    def upload_file(self, local: str, remote: str):
         if self.sftp:
             if exists(local):
                 print(f'[green]|INFO|{self.host_name}|{self.host}| Upload file: {basename(local)} to {remote}')
@@ -72,7 +72,7 @@ class SshClient:
         else:
             raise SshClientException(f'[red]|WARNING|{self.host_name}|{self.host}| Sftp chanel not created.')
 
-    def download_dir(self, remote, local):
+    def download_dir(self, remote: str, local: str):
         if self.sftp:
             for entry in self.sftp.listdir_attr(remote):
                 remote_filename = join(remote, entry.filename).replace('\\', '/')
@@ -83,7 +83,7 @@ class SshClient:
                 else:
                     self.download_file(remote_filename, local_filename)
 
-    def download_file(self, remote, local):
+    def download_file(self, remote: str, local: str):
         if self.sftp:
             with open(local, 'wb') as local_file:
                 self.sftp.getfo(remote, local_file)
@@ -119,7 +119,7 @@ class SshClient:
     def get_service_log(self, service_name: str, line_num: str | int = 20) -> str:
         return self.exec_command(f'sudo journalctl -n {line_num} -u {service_name}')
 
-    def get_service_status(self, service_name) -> bool:
+    def get_service_status(self, service_name: str) -> bool:
         return self.exec_command(f'systemctl is-active {service_name}') == 'active'
 
     def exec_command(self, command: str) -> str | None:
@@ -142,7 +142,7 @@ class SshClient:
         if self.ssh is not None:
             self.ssh.close()
 
-    def ssh_exec(self, command):
+    def ssh_exec(self, command: str):
         if self.ssh is not None:
             print(f"[green]|INFO|{self.host_name}|{self.host}| Exec command: {command}")
             self.ssh.send(f'{command}\n')
