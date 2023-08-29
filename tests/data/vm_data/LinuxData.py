@@ -55,7 +55,7 @@ class LinuxData(VmData):
         python3 -m venv venv
         source ./venv/bin/activate
         python3 ./install_requirements.py
-        invoke desktop-test -v {self.version}\
+        invoke desktop-test -d -v {self.version}\
 {' -t' if self.telegram else ''}\
 {(' -c ' + self.custom_config_path) if self.custom_config else ''}\
 {(' -l ' + self.lic_file) if self.custom_config else ''}\
