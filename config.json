@@ -1,6 +1,6 @@
 {
   "title": "ONLYOFFICE",
-  "desktop_script": "https://github.com/l8556/desktop_editor_testing.git",
+  "desktop_script": "https://github.com/ONLYOFFICE-QA/desktop_editor_testing.git",
   "branch": "",
   "token_file": "",
   "chat_id_file": "",
