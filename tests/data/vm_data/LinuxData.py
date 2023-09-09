@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass
 from os.path import basename, splitext, isfile
+from posixpath import join
 
 from .vm_data import VmData
 
@@ -10,19 +11,19 @@ class LinuxData(VmData):
     def __post_init__(self):
         if not self.user or not self.version or not self.name or not self.ip:
             raise ValueError("User, version, name, ip is a required parameter.")
-        self.home_dir = f'/home/{self.user}'
-        self.script_path = f'{self.home_dir}/script.sh'
-        self.script_dir = f"{self.home_dir}/scripts"
-        self.desktop_testing_path = f"{self.script_dir}/{splitext(basename(self.desktop_testing_url))[0]}"
-        self.report_path = f'{self.desktop_testing_path}/reports/'
-        self.custom_config_path = f"{self.script_dir}/custom_config.json"
-        self.tg_dir = f"{self.home_dir}/.telegram"
-        self.tg_token_file = f"{self.tg_dir}/token"
-        self.tg_chat_id_file = f"{self.tg_dir}/chat"
-        self.services_dir = '/etc/systemd/system'
+        self.home_dir = join('/home', self.user)
+        self.script_path = join(self.home_dir, 'script.sh')
+        self.script_dir = join(self.home_dir, 'scripts')
+        self.desktop_testing_path = join(self.script_dir, splitext(basename(self.desktop_testing_url))[0])
+        self.report_path = join(self.desktop_testing_path, 'reports')
+        self.custom_config_path = join(self.script_dir, 'custom_config.json')
+        self.tg_dir = join(self.home_dir, '.telegram')
+        self.tg_token_file = join(self.tg_dir, 'token')
+        self.tg_chat_id_file = join(self.tg_dir, 'chat')
+        self.services_dir = join('/etc', 'systemd', 'system')
         self.my_service_name = 'myscript.service'
-        self.my_service_path = f'{self.services_dir}/{self.my_service_name}'
-        self.lic_file = f"{self.script_dir}/test_lic.lickey"
+        self.my_service_path = join(self.services_dir, self.my_service_name)
+        self.lic_file = join(self.script_dir, 'test_lic.lickey')
 
     @property
     def start_service_commands(self) -> list:
