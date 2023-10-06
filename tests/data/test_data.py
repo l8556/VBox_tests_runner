@@ -22,6 +22,7 @@ class TestData:
     status_bar: bool = True
     telegram: bool = False
     custom_config_mode: bool = False
+    update_from: str = None
 
     def __post_init__(self):
         self.config: Dict = self._read_config()

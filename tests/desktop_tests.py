@@ -122,6 +122,7 @@ class DesktopTests:
             user=user,
             ip=ip,
             version=self.data.version,
+            old_version=self.data.update_from,
             name=self.vm_name,
             telegram=self.data.telegram,
             custom_config=self.data.custom_config_mode
