@@ -36,7 +36,7 @@ def desktop_test(c, version=None, update_from=None, name=None, processes=None, d
             DesktopTests(vm, data).run(headless=False if headless else True)
 
     report.get_full(data.version)
-    report.send_to_tg(data.version, data.title, data.tg_token, data.tg_chat_id) if not name else ...
+    report.send_to_tg(data.version, data.title, data.tg_token, data.tg_chat_id, data.update_from) if not name else ...
 
 
 @task
