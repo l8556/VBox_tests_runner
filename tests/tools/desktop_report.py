@@ -51,7 +51,7 @@ class DesktopReport:
         Telegram(token_path=token, chat_id_path=chat_id).send_document(
             self.path,
             caption=f"{title} desktop editor tests completed on version: "
-                    f"{(update_from + '->')if update_from else ''}{version}\n\n"
+                    f"`{(update_from + ' -> ')if update_from else ''}{version}`\n\n"
                     f"Result: {'`All tests passed`' if self.all_is_passed() else '`Some tests have errors`'}\n\n"
                     f"Number of tested Os: `{self.get_total_count('Exit_code')}`"
         )
