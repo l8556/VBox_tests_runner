@@ -104,7 +104,7 @@ class DesktopTests:
         ])
 
     def _wait_execute_service(self, ssh: SshClient):
-        print(f"[red]{'-' * 90}\n|INFO|{self.vm.name}| Wait executing script on vm\n{'-' * 90}")
+        print(f"[bold cyan]{'-' * 90}\n|INFO|{self.vm.name}| Wait executing script on vm\n{'-' * 90}")
         ssh.wait_execute_service(self.vm.my_service_name, status_bar=self.data.status_bar)
 
     def _download_report(self, ssh: SshClient):
