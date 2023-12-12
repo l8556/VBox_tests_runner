@@ -61,6 +61,7 @@ class DesktopTests:
 
     def configurate_virtual_machine(self, vm: VirtualMachine) -> None:
         vm.set_cpus(self.vm_cores)
+        vm.nested_virtualization(True)
         vm.set_memory(self.vm_memory)
         vm.audio(False)
         vm.speculative_execution_control(True)

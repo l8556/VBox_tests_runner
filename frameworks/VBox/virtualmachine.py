@@ -117,6 +117,11 @@ class VirtualMachine:
         self._run_cmd(f"{cmd.modifyvm} {self.name} --audio-driver {'default' if turn else 'none'}")
         print(f"[green]|INFO|{self.name}| Audio interface is {'on' if turn else 'off'}")
 
+    def nested_virtualization(self, turn: bool):
+        _turn = 'on' if turn else 'off'
+        self._run_cmd(f"{cmd.modifyvm} {self.name} --nested-hw-virt {_turn}")
+        print(f"[green]|INFO|{self.name}| Nested VT-x/AMD-V is {_turn}")
+
     def set_cpus(self, num: int):
         self._run_cmd(f"{cmd.modifyvm} {self.name} --cpus {num}")
         print(f"[green]|INFO|{self.name}| The number of processor cores is set to {num}")
