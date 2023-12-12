@@ -17,9 +17,10 @@ print = console.print
 
 
 @task
-def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=False, custom_config=False, headless=False):
+def desktop_test(c, version=None, update_from=None, name=None, processes=None, detailed_telegram=False, custom_config=False, headless=False):
     data = TestData(
         version=version if version else Prompt.ask('[red]Please enter version'),
+        update_from=update_from,
         telegram=detailed_telegram,
         config_path=join(os.getcwd(), 'custom_config.json') if custom_config else join(os.getcwd(), 'config.json'),
         custom_config_mode=custom_config
@@ -35,7 +36,7 @@ def desktop_test(c, version=None, name=None, processes=None, detailed_telegram=F
             DesktopTests(vm, data).run(headless=False if headless else True)
 
     report.get_full(data.version)
-    report.send_to_tg(data.version, data.title, data.tg_token, data.tg_chat_id) if not name else ...
+    report.send_to_tg(data.version, data.title, data.tg_token, data.tg_chat_id, data.update_from) if not name else ...
 
 
 @task

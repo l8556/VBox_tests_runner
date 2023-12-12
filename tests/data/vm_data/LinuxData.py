@@ -57,6 +57,7 @@ class LinuxData(VmData):
         source ./venv/bin/activate
         python3 ./install_requirements.py
         invoke open-test -d -v {self.version}\
+{' -u ' + self.old_version if self.old_version else ''}\
 {' -t' if self.telegram else ''}\
 {(' -c ' + self.custom_config_path) if self.custom_config else ''}\
 {(' -l ' + self.lic_file) if self.custom_config else ''}\
