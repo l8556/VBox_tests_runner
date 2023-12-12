@@ -17,6 +17,7 @@ class TestData:
     project_dir: str = join(getcwd())
     tg_dir: str = join(expanduser('~'), '.telegram')
     tmp_dir: str = join(project_dir, 'tmp')
+    know_hosts: str = join(expanduser('~'), '.ssh', 'known_hosts')
     lic_file: str = join(project_dir, 'test_lic.lickey')
     status_bar: bool = True
     telegram: bool = False

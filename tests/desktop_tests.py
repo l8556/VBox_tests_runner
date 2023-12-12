@@ -38,6 +38,7 @@ class DesktopTests:
         try:
             self.run_vm(virtual_machine, headless=False)
             self.vm = self._create_vm_data(virtual_machine.get_logged_user(), virtual_machine.get_ip())
+            self._clean_know_hosts(self.vm.ip)
             self.run_script_on_vm()
         except VirtualMachinException:
             print(f"[bold red]|ERROR|{self.vm_name}| Failed to create  a virtual machine")
@@ -134,3 +135,9 @@ class DesktopTests:
                 f"{self.data.version}_{self.data.title}_report.csv"
             )
         )
+
+    def _clean_know_hosts(self, ip: str):
+        with open(self.data.know_hosts, 'r') as file:
+            filtered_lines = [line for line in file.readlines() if not line.startswith(ip)]
+        with open(self.data.know_hosts, 'w') as file:
+            file.writelines(filtered_lines)
