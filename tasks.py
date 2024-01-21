@@ -33,7 +33,7 @@ def desktop_test(c, version=None, update_from=None, name=None, processes=None, d
         return multiprocess.run(data.version, data.vm_names, num_processes, 10)
     else:
         for vm in Vbox().check_vm_names([name] if name else data.vm_names):
-            DesktopTests(vm, data).run(headless=False if headless else True)
+            DesktopTests(vm, data).run(headless=headless)
 
     report.get_full(data.version)
     report.send_to_tg(data.version, data.title, data.tg_token, data.tg_chat_id, data.update_from) if not name else ...

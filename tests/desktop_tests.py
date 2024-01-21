@@ -36,7 +36,7 @@ class DesktopTests:
     def run(self, headless: bool = True):
         virtual_machine = VirtualMachine(self.vm_name)
         try:
-            self.run_vm(virtual_machine, headless=False)
+            self.run_vm(virtual_machine, headless=headless)
             self.vm = self._create_vm_data(virtual_machine.get_logged_user(), virtual_machine.get_ip())
             self._clean_know_hosts(self.vm.ip)
             self.run_script_on_vm()
