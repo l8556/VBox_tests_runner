@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import signal
-from os.path import join, exists
+from os.path import join
 
 from frameworks.VBox import VirtualMachine
 from frameworks.VBox.virtualmachine import VirtualMachinException
