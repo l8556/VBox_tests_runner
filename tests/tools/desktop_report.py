@@ -3,7 +3,7 @@ from os.path import isfile
 from os.path import dirname
 from rich import print
 
-from frameworks.host_control import FileUtils
+from host_tools import File
 from frameworks.report import Report
 from frameworks.telegram import Telegram
 
@@ -13,7 +13,7 @@ class DesktopReport:
         self.path = report_path
         self.dir = dirname(self.path)
         self.report = Report()
-        FileUtils.create_dir(self.dir, silence=True)
+        File.create_dir(self.dir, silence=True)
 
     def write(self, version: str, vm_name: str, exit_code: str) -> None:
         self._write_titles() if not isfile(self.path) else ...
@@ -27,9 +27,9 @@ class DesktopReport:
         return df['Exit_code'].eq('Passed').all()
 
     def get_full(self, version: str) -> str:
-        FileUtils.delete(self.path, silence=True) if isfile(self.path) else ...
+        File.delete(self.path, silence=True) if isfile(self.path) else ...
         self.report.merge(
-            FileUtils.get_paths(self.dir, name_include=f"{version}", extension='csv'),
+            File.get_paths(self.dir, name_include=f"{version}", extension='csv'),
             self.path
         )
         return self.path

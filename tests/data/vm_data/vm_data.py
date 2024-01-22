@@ -3,8 +3,7 @@ import os
 from dataclasses import dataclass
 from os.path import join
 
-from frameworks.VBox import VirtualMachine
-from frameworks.host_control import FileUtils
+from host_tools import File
 
 
 @dataclass
@@ -16,5 +15,5 @@ class VmData:
     version: str
     old_version: str
     custom_config: bool
-    desktop_testing_url: str = FileUtils.read_json(join(os.getcwd(), 'config.json'))['desktop_script']
-    branch: str = FileUtils.read_json(join(os.getcwd(), 'config.json')).get('branch')
+    desktop_testing_url: str = File.read_json(join(os.getcwd(), 'config.json'))['desktop_script']
+    branch: str = File.read_json(join(os.getcwd(), 'config.json')).get('branch')

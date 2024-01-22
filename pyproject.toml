@@ -10,12 +10,12 @@ packages = [{include = "vbox_control"}]
 python = "^3.11"
 invoke = "*"
 rich = "*"
-psutil = "*"
 py7zr = "*"
 requests = "*"
 paramiko = "*"
 distro = "^1.8.0"
 pandas = "*"
+host-tools = { git = "https://github.com/l8556/host_tools.git", branch = "master" }
 
 
 [build-system]

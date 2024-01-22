@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from os.path import join
+from os.path import join, isdir
 
 from invoke import task
 from rich.prompt import Prompt
@@ -17,7 +17,16 @@ print = console.print
 
 
 @task
-def desktop_test(c, version=None, update_from=None, name=None, processes=None, detailed_telegram=False, custom_config=False, headless=False):
+def desktop_test(
+        c,
+        version=None,
+        update_from=None,
+        name=None,
+        processes=None,
+        detailed_telegram=False,
+        custom_config=False,
+        headless=False
+):
     data = TestData(
         version=version if version else Prompt.ask('[red]Please enter version'),
         update_from=update_from,

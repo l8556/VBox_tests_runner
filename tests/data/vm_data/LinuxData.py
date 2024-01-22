@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from dataclasses import dataclass
-from os.path import basename, splitext, isfile
+from os.path import basename, splitext
 from posixpath import join
 
 from .vm_data import VmData
