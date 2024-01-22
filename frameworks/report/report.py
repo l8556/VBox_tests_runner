@@ -7,8 +7,6 @@ import pandas as pd
 from host_tools.utils import Dir
 from rich import print
 
-from telegram import Telegram
-
 
 class Report:
     def __init__(self):
@@ -57,11 +55,13 @@ class Report:
     def read(csv_file: str, delimiter="\t") -> pd.DataFrame | None:
         try:
             return pd.read_csv(csv_file, delimiter=delimiter)
+
         except pd.errors.EmptyDataError:
             print(f"[red]|WARNING| Report: {csv_file} is empty.")
             return None
+
         except Exception as e:
-            Telegram().send_message(f'Exception when opening report.csv: {csv_file}\nException: {e}\nTry skip bad lines')
+            print(f'Exception when opening report.csv: {csv_file}\nException: {e}\nTry skip bad lines')
             return pd.read_csv(csv_file, delimiter=delimiter, on_bad_lines='skip')
 
     @staticmethod

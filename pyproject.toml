@@ -16,7 +16,7 @@ paramiko = "*"
 distro = "^1.8.0"
 pandas = "*"
 host-tools = { git = "https://github.com/l8556/host_tools.git", branch = "master" }
-telegram = { git = "https://github.com/l8556/TelegramApi.git", branch = "master" }
+telegram = { git = "https://github.com/l8556/TelegramApi.git", branch = "feature/improved-request-to-telegram.org" }
 
 
 [build-system]

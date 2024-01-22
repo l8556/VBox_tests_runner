@@ -5,6 +5,7 @@ from typing import Dict
 from dataclasses import dataclass
 from os.path import join, isfile, expanduser
 from host_tools import File
+
 from frameworks.console import MyConsole
 
 console = MyConsole().console
@@ -37,9 +38,9 @@ class TestData:
         if token_filename:
             file_path = join(self.tg_dir, token_filename)
             if isfile(file_path):
-                return file_path
+                return File.read(file_path).strip()
             print(f"[red]|WARNING| Telegram Token from config file not exists: {file_path}")
-        return join(self.tg_dir, 'token')
+        return File.read(join(self.tg_dir, 'token')).strip()
 
     @property
     def tg_chat_id(self) -> str:
@@ -47,9 +48,9 @@ class TestData:
         if chat_id_filename:
             file_path = join(self.tg_dir, chat_id_filename)
             if isfile(file_path):
-                return file_path
+                return File.read(file_path).strip()
             print(f"[red]|WARNING| Telegram Chat id from config file not exists: {file_path}")
-        return join(self.tg_dir, 'chat')
+        return File.read(join(self.tg_dir, 'chat')).strip()
 
     def _read_config(self):
         if not isfile(self.config_path):

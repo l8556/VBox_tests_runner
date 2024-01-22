@@ -1254,8 +1254,8 @@ rich = "*"
 [package.source]
 type = "git"
 url = "https://github.com/l8556/TelegramApi.git"
-reference = "master"
-resolved_reference = "7fd0486f678ec8d35d00bd42a333a070d86cbaf7"
+reference = "feature/improved-request-to-telegram.org"
+resolved_reference = "f5175d91a4d51cbba436c23a11bbf80691ddea42"
 
 [[package]]
 name = "texttable"
@@ -1298,4 +1298,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "d64a0d346e57d826bdf7d38437f05c0bc4dbb699504e1e49160372f1bb081dd8"
+content-hash = "fbddd214ac9505703368464dff6f7fc12744de2ebf3f152e6b284506a981e96d"
