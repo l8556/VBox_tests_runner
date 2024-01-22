@@ -422,7 +422,7 @@ rich = "*"
 type = "git"
 url = "https://github.com/l8556/host_tools.git"
 reference = "master"
-resolved_reference = "d616db77e36cec3131d0bbbe3fa15ef58dc798e8"
+resolved_reference = "949d8d9c777d2e8c29a7597577004ace42384bb4"
 
 [[package]]
 name = "idna"
