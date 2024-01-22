@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 from os.path import isfile
 from os.path import dirname
+
+from host_tools.utils import Dir
 from rich import print
 
 from host_tools import File
 from frameworks.report import Report
-from frameworks.telegram import Telegram
+from telegram import Telegram
 
 
 class DesktopReport:
@@ -13,7 +15,7 @@ class DesktopReport:
         self.path = report_path
         self.dir = dirname(self.path)
         self.report = Report()
-        File.create_dir(self.dir, silence=True)
+        Dir.create(self.dir, stdout=False)
 
     def write(self, version: str, vm_name: str, exit_code: str) -> None:
         self._write_titles() if not isfile(self.path) else ...
@@ -27,7 +29,7 @@ class DesktopReport:
         return df['Exit_code'].eq('Passed').all()
 
     def get_full(self, version: str) -> str:
-        File.delete(self.path, silence=True) if isfile(self.path) else ...
+        File.delete(self.path, stdout=False) if isfile(self.path) else ...
         self.report.merge(
             File.get_paths(self.dir, name_include=f"{version}", extension='csv'),
             self.path
@@ -48,7 +50,7 @@ class DesktopReport:
     def send_to_tg(self, version: str, title: str, token: str, chat_id: str, update_from: str = None):
         if not isfile(self.path):
             return print(f"[red]|ERROR| Report for sending to telegram not exists: {self.path}")
-        Telegram(token_path=token, chat_id_path=chat_id).send_document(
+        Telegram(token=File.read(token).strip(), chat_id=File.read(chat_id).strip()).send_document(
             self.path,
             caption=f"{title} desktop editor tests completed on version: "
                     f"`{(update_from + ' -> ')if update_from else ''}{version}`\n\n"

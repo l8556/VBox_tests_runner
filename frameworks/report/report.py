@@ -7,7 +7,7 @@ import pandas as pd
 from host_tools.utils import Dir
 from rich import print
 
-from frameworks.telegram import Telegram
+from telegram import Telegram
 
 
 class Report:
