@@ -2,11 +2,13 @@
 import signal
 from os.path import join
 
+from host_tools.utils import Dir
+
 from frameworks.VBox import VirtualMachine
 from frameworks.VBox.virtualmachine import VirtualMachinException
 from frameworks.console import MyConsole
 from frameworks.decorators import retry
-from frameworks.host_control import FileUtils
+from host_tools import File
 from frameworks.ssh_client.ssh_client import SshClient
 from tests.data import LinuxData, TestData
 from tests.tools.desktop_report import DesktopReport
@@ -29,7 +31,7 @@ class DesktopTests:
         self.data = test_data
         self.vm_name = vm_name
         self.vm = None
-        FileUtils.create_dir((self.data.report_dir, self.data.tmp_dir), silence=True)
+        Dir.create((self.data.report_dir, self.data.tmp_dir), stdout=False)
         self.report = self._create_report()
 
     @retry(max_attempts=2, exception_type=VirtualMachinException)
@@ -88,7 +90,7 @@ class DesktopTests:
 
     @staticmethod
     def _create_file(path: str, text: str) -> str:
-        FileUtils.file_writer(path, '\n'.join(line.strip() for line in text.split('\n')), newline='')
+        File.write(path, '\n'.join(line.strip() for line in text.split('\n')), newline='')
         return path
 
     def _start_my_service(self, ssh: SshClient):

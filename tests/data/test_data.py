@@ -4,7 +4,7 @@ from typing import Dict
 
 from dataclasses import dataclass
 from os.path import join, isfile, expanduser
-from frameworks.host_control import FileUtils
+from host_tools import File
 from frameworks.console import MyConsole
 
 console = MyConsole().console
@@ -54,4 +54,4 @@ class TestData:
     def _read_config(self):
         if not isfile(self.config_path):
             raise FileNotFoundError(f"[red]|ERROR| Configuration file not found: {self.config_path}")
-        return FileUtils.read_json(self.config_path)
+        return File.read_json(self.config_path)

@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from rich.console import Console
 
-from frameworks.decorators import singleton
-
-
 class MyConsole:
     def __init__(self):
         self.console = Console()
