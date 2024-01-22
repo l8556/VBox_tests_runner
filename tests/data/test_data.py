@@ -34,23 +34,31 @@ class TestData:
 
     @property
     def tg_token(self) -> str:
+        return File.read(self.token_file).strip()
+
+    @property
+    def token_file(self):
         token_filename = self.config.get('token_file').strip()
         if token_filename:
             file_path = join(self.tg_dir, token_filename)
             if isfile(file_path):
-                return File.read(file_path).strip()
+                return file_path
             print(f"[red]|WARNING| Telegram Token from config file not exists: {file_path}")
-        return File.read(join(self.tg_dir, 'token')).strip()
+        return join(self.tg_dir, 'token')
 
     @property
     def tg_chat_id(self) -> str:
+        return File.read(self.chat_id_file).strip()
+
+    @property
+    def chat_id_file(self) -> str:
         chat_id_filename = self.config.get('chat_id_file').strip()
         if chat_id_filename:
             file_path = join(self.tg_dir, chat_id_filename)
             if isfile(file_path):
-                return File.read(file_path).strip()
+                return file_path
             print(f"[red]|WARNING| Telegram Chat id from config file not exists: {file_path}")
-        return File.read(join(self.tg_dir, 'chat')).strip()
+        return join(self.tg_dir, 'chat')
 
     def _read_config(self):
         if not isfile(self.config_path):
