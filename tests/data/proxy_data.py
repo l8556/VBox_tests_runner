@@ -8,7 +8,7 @@ from telegram import Proxy
 
 @dataclass
 class ProxyData:
-    proxy_config_path: str = join(expanduser('~'), '.proxy', 'config.json')
+    proxy_config_path: str = join(expanduser('~'), '.telegram', 'proxy.json')
 
     def __post_init__(self):
         self.config: Proxy | None = self._get_proxy_config()

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import signal
-from os.path import join
+from os.path import join, dirname
 
 from host_tools.utils import Dir
 
@@ -11,6 +11,7 @@ from frameworks.decorators import retry
 from host_tools import File
 from frameworks.ssh_client.ssh_client import SshClient
 from tests.data import LinuxData, TestData
+from tests.data.proxy_data import ProxyData
 from tests.tools.desktop_report import DesktopReport
 
 console = MyConsole().console
@@ -83,6 +84,7 @@ class DesktopTests:
         script = self._create_file(join(self.data.tmp_dir, 'script.sh'), self.vm.script_sh())
         ssh.upload_file(self.data.token_file, self.vm.tg_token_file)
         ssh.upload_file(self.data.chat_id_file, self.vm.tg_chat_id_file)
+        ssh.upload_file(ProxyData().proxy_config_path, self.vm.proxy_config_file)
         ssh.upload_file(service, self.vm.my_service_path)
         ssh.upload_file(script, self.vm.script_path)
         ssh.upload_file(self.data.config_path, self.vm.custom_config_path)

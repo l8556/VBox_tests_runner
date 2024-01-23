@@ -20,6 +20,7 @@ class LinuxData(VmData):
         self.tg_dir = join(self.home_dir, '.telegram')
         self.tg_token_file = join(self.tg_dir, 'token')
         self.tg_chat_id_file = join(self.tg_dir, 'chat')
+        self.proxy_config_file = join(self.tg_dir, 'proxy.json')
         self.services_dir = join('/etc', 'systemd', 'system')
         self.my_service_name = 'myscript.service'
         self.my_service_path = join(self.services_dir, self.my_service_name)
