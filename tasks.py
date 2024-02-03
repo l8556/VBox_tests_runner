@@ -2,9 +2,12 @@
 import os
 from os.path import join, isdir
 
+from host_tools import File
 from invoke import task
 from rich.prompt import Prompt
 from rich import print
+from telegram import Telegram
+
 from frameworks.VBox import VirtualMachine, Vbox
 from tests.data import TestData
 from tests.desktop_tests import DesktopTests

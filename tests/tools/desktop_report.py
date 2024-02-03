@@ -9,7 +9,6 @@ from host_tools import File
 from frameworks.report import Report
 from telegram import Telegram
 
-from tests.data.proxy_data import ProxyData
 
 
 class DesktopReport:
@@ -60,7 +59,7 @@ class DesktopReport:
         if not isfile(self.path):
             return print(f"[red]|ERROR| Report for sending to telegram not exists: {self.path}")
 
-        Telegram(token=token, chat_id=chat_id, proxy=ProxyData().config).send_document(
+        Telegram(token=token, chat_id=chat_id).send_document(
             self.path,
             caption=f"{title} desktop editor tests completed on version: "
                     f"`{(update_from + ' -> ')if update_from else ''}{version}`\n\n"

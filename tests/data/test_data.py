@@ -20,6 +20,7 @@ class TestData:
     tmp_dir: str = join(project_dir, 'tmp')
     know_hosts: str = join(expanduser('~'), '.ssh', 'known_hosts')
     lic_file: str = join(project_dir, 'test_lic.lickey')
+    proxy_config_path: str = join(expanduser('~'), '.telegram', 'proxy.json')
     status_bar: bool = True
     telegram: bool = False
     custom_config_mode: bool = False
