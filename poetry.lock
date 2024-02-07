@@ -422,7 +422,7 @@ rich = "*"
 type = "git"
 url = "https://github.com/l8556/host_tools.git"
 reference = "master"
-resolved_reference = "d616db77e36cec3131d0bbbe3fa15ef58dc798e8"
+resolved_reference = "949d8d9c777d2e8c29a7597577004ace42384bb4"
 
 [[package]]
 name = "idna"
@@ -1238,6 +1238,26 @@ files = [
 ]
 
 [[package]]
+name = "telegram"
+version = "2.0"
+description = ""
+optional = false
+python-versions = "^3.7"
+files = []
+develop = false
+
+[package.dependencies]
+host-tools = {git = "https://github.com/l8556/host_tools.git", branch = "master"}
+requests = "*"
+rich = "*"
+
+[package.source]
+type = "git"
+url = "https://github.com/l8556/TelegramApi.git"
+reference = "master"
+resolved_reference = "5b0485a32ed6760e192e87aaee3c3e1af27b9845"
+
+[[package]]
 name = "texttable"
 version = "1.7.0"
 description = "module to create simple ASCII tables"
@@ -1278,4 +1298,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "c2e17f1f8fbea86f5ee59a78495aa3eae8045fb9cdccdc80356cd9098dbfbd13"
+content-hash = "d64a0d346e57d826bdf7d38437f05c0bc4dbb699504e1e49160372f1bb081dd8"

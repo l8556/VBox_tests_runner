@@ -5,6 +5,7 @@ from typing import Dict
 from dataclasses import dataclass
 from os.path import join, isfile, expanduser
 from host_tools import File
+
 from frameworks.console import MyConsole
 
 console = MyConsole().console
@@ -19,6 +20,7 @@ class TestData:
     tmp_dir: str = join(project_dir, 'tmp')
     know_hosts: str = join(expanduser('~'), '.ssh', 'known_hosts')
     lic_file: str = join(project_dir, 'test_lic.lickey')
+    proxy_config_path: str = join(expanduser('~'), '.telegram', 'proxy.json')
     status_bar: bool = True
     telegram: bool = False
     custom_config_mode: bool = False
@@ -33,6 +35,10 @@ class TestData:
 
     @property
     def tg_token(self) -> str:
+        return File.read(self.token_file).strip()
+
+    @property
+    def token_file(self):
         token_filename = self.config.get('token_file').strip()
         if token_filename:
             file_path = join(self.tg_dir, token_filename)
@@ -43,6 +49,10 @@ class TestData:
 
     @property
     def tg_chat_id(self) -> str:
+        return File.read(self.chat_id_file).strip()
+
+    @property
+    def chat_id_file(self) -> str:
         chat_id_filename = self.config.get('chat_id_file').strip()
         if chat_id_filename:
             file_path = join(self.tg_dir, chat_id_filename)
