@@ -99,6 +99,7 @@ class DesktopTests:
         ssh.ssh_exec_commands(self.vm.start_service_commands)
 
     def _create_vm_dirs(self, ssh: SshClient):
+        ssh.ssh_exec_commands(f'mkdir {self.vm.script_dir}')
         ssh.ssh_exec_commands(f'mkdir {self.vm.tg_dir}')
 
     def _change_vm_service_dir_access(self, ssh: SshClient):
