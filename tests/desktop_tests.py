@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import signal
-from os.path import join, dirname, isfile
-from typing import Optional
+from os.path import join
 
 from host_tools.utils import Dir
 
@@ -42,7 +41,7 @@ class DesktopTests:
             self.run_vm(virtual_machine, headless=headless)
             self.vm = self._create_vm_data(virtual_machine.get_logged_user(), virtual_machine.get_ip())
             self._clean_know_hosts(self.vm.ip)
-            self.run_script_on_vm(user_password=self._get_user_password(virtual_machine))
+            self.run_script_on_vm()
         except VirtualMachinException:
             print(f"[bold red]|ERROR|{self.vm_name}| Failed to create  a virtual machine")
             self.report.write(self.data.version, self.vm_name, "FAILED_CREATE_VM")
@@ -69,9 +68,9 @@ class DesktopTests:
         vm.audio(False)
         vm.speculative_execution_control(True)
 
-    def run_script_on_vm(self, user_password: str = None):
+    def run_script_on_vm(self):
         ssh = SshClient(self.vm.ip, self.vm.name)
-        ssh.connect(self.vm.user, password=user_password)
+        ssh.connect(self.vm.user, password=self.data.vm_password)
         self._create_vm_dirs(ssh)
         self._change_vm_service_dir_access(ssh)
         self._upload_files(ssh)
@@ -136,7 +135,11 @@ class DesktopTests:
 
     def _create_report(self):
         return DesktopReport(
-            join(self.data.report_dir, self.vm_name, f"{self.data.version}_{self.data.title}_report.csv")
+            join(
+                self.data.report_dir,
+                self.vm_name,
+                f"{self.data.version}_{self.data.title}_report.csv"
+            )
         )
 
     def _clean_know_hosts(self, ip: str):
@@ -144,11 +147,3 @@ class DesktopTests:
             filtered_lines = [line for line in file.readlines() if not line.startswith(ip)]
         with open(self.data.know_hosts, 'w') as file:
             file.writelines(filtered_lines)
-
-    def _get_user_password(self, vm: VirtualMachine) -> Optional[str]:
-        try:
-            password_file = join(dirname(vm.get_parameter_info('CfgFile')), 'password')
-            password = File.read(password_file).strip() if isfile(password_file) else None
-            return password if password else self.data.config.get('password', None)
-        except TypeError:
-            return self.data.config.get('password', None)
