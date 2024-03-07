@@ -136,11 +136,7 @@ class DesktopTests:
 
     def _create_report(self):
         return DesktopReport(
-            join(
-                self.data.report_dir,
-                self.vm_name,
-                f"{self.data.version}_{self.data.title}_report.csv"
-            )
+            join(self.data.report_dir, self.vm_name, f"{self.data.version}_{self.data.title}_report.csv")
         )
 
     def _clean_know_hosts(self, ip: str):
