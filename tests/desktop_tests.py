@@ -70,7 +70,7 @@ class DesktopTests:
 
     def run_script_on_vm(self):
         ssh = SshClient(self.vm.ip, self.vm.name)
-        ssh.connect(self.vm.user)
+        ssh.connect(self.vm.user, password=self.data.vm_password)
         self._create_vm_dirs(ssh)
         self._change_vm_service_dir_access(ssh)
         self._upload_files(ssh)

@@ -39,7 +39,7 @@ def desktop_test(
     )
 
     num_processes = int(processes) if processes else 1
-    report = DesktopReport(report_path=data.full_report_path)
+    report = DesktopReport(report_path=data.report_path)
 
     if num_processes > 1 and not name:
         return multiprocess.run(data.version, data.vm_names, num_processes, 10)
@@ -61,11 +61,13 @@ def run_vm(c, name: str = '', headless=False):
 
 
 @task
-def stop_vm(c, name: str = '', all: bool = False):
-    if all:
+def stop_vm(c, name: str = None):
+    if name:
+        VirtualMachine(Vbox().check_vm_names(name)).stop()
+    else:
+        Prompt.ask(f"[red]|WARNING| All running virtual machines will be stopped. Press Enter to continue.")
         for vm in [line.split('"')[1] for line in Vbox.vm_list()]:
-            return VirtualMachine(vm).stop()
-    VirtualMachine(Vbox().check_vm_names(name)).stop()
+            VirtualMachine(vm).stop()
 
 
 @task
