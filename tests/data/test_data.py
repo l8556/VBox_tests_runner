@@ -32,7 +32,6 @@ class TestData:
         self.title: str = self.config.get('title', 'Undefined_title')
         self.report_dir: str = join(self.project_dir, 'reports', self.title, self.version)
         self.report_path: str = join(self.report_dir, f"{self.version}_{self.title}_desktop_tests_report.csv")
-        self.vm_password: str = self.config.get('password')
 
     @property
     def tg_token(self) -> str:
