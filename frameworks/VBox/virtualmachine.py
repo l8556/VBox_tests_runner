@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
+from typing import Optional
 
 from .commands import Commands as cmd
 from subprocess import call, getoutput
@@ -15,6 +16,9 @@ class VirtualMachinException(Exception): ...
 class VirtualMachine:
     def __init__(self, vm_name: str):
         self.name = vm_name
+
+    def get_group_name(self) -> Optional[str]:
+        return self.get_parameter_info('groups').strip().replace('/', '')
 
     def network_adapter(
             self,
