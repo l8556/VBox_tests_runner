@@ -61,18 +61,18 @@ def run_vm(c, name: str = '', headless=False):
 
 
 @task
-def stop_vm(c, name: str = None):
+def stop_vm(c, name: str = None, group_name: str = None):
     if name:
         VirtualMachine(Vbox().check_vm_names(name)).stop()
     else:
         Prompt.ask(f"[red]|WARNING| All running virtual machines will be stopped. Press Enter to continue.")
-        for vm in [line.split('"')[1] for line in Vbox.vm_list()]:
+        for vm in Vbox().get_vm_ids(group_name=group_name):
             VirtualMachine(vm).stop()
 
 
 @task
-def vm_list(c):
-    print(Vbox.vm_list())
+def vm_list(c, group_name: str = None):
+    print(Vbox().vm_list(group_name))
 
 
 @task
