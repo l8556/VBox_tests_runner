@@ -15,14 +15,14 @@ class Vbox:
         return vm_list
 
     def check_vm_names(self, vm_names: list | str) -> list | str:
-        vm_names = self.get_vm_names()
+        existing_names = self.get_vm_names()
         for name in [vm_names] if isinstance(vm_names, str) else vm_names:
-            if name not in vm_names:
-                raise print(f"[bold red]|ERROR| The Virtual Machine {name} not exists. Vm list:\n{vm_names}")
+            if name not in existing_names:
+                raise print(f"[bold red]|ERROR| The Virtual Machine {name} not exists. Vm list:\n{existing_names}")
         return vm_names
 
     def get_vm_names(self, group_name: str = None) -> list:
         return [vm[0] for vm in self.vm_list(group_name)]
 
-    def get_vm_ids(self, group_name: str = None) -> list:
+    def get_vm_uuids(self, group_name: str = None) -> list:
         return [vm[1] for vm in self.vm_list(group_name)]
