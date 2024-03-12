@@ -5,6 +5,7 @@ from dataclasses import dataclass
 class Commands:
     vboxmanage: str = 'vboxmanage'
     list: str = f'{vboxmanage} list vms'
+    group_list: str = f"{vboxmanage} list groups"
     snapshot: str = f'{vboxmanage} snapshot'
     modifyvm: str = f'{vboxmanage} modifyvm'
     controlvm: str = f'{vboxmanage} controlvm'

@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
-from os.path import join, isdir
-
-from host_tools import File
+from os.path import join
 from invoke import task
 from rich.prompt import Prompt
 from rich import print
-from telegram import Telegram
 
 from frameworks.VBox import VirtualMachine, Vbox
 from tests.data import TestData
@@ -63,9 +60,13 @@ def run_vm(c, name: str = '', headless=False):
 @task
 def stop_vm(c, name: str = None, group_name: str = None):
     if name:
-        VirtualMachine(Vbox().check_vm_names(name)).stop()
+        vm = VirtualMachine(Vbox().check_vm_names(name))
+        vm.stop() if vm.check_status() else ...
     else:
-        Prompt.ask(f"[red]|WARNING| All running virtual machines will be stopped. Press Enter to continue.")
+        Prompt.ask(
+            f"[red]|WARNING| All running virtual machines "
+            f"{('in group ' + group_name) if group_name else ''} will be stopped. Press Enter to continue."
+        )
         vms_list = Vbox().vm_list(group_name=group_name)
         for vm_info in vms_list:
             virtualmachine = VirtualMachine(vm_info[1])
@@ -76,9 +77,18 @@ def stop_vm(c, name: str = None, group_name: str = None):
 
 @task
 def vm_list(c, group_name: str = None):
-    print(Vbox().vm_list(group_name))
+    vm_names = Vbox().vm_list(group_name)
+    print(vm_names)
+    return vm_names
 
 
 @task
-def out_info(c, name: str = ''):
-    print(VirtualMachine(Vbox().check_vm_names(name)).get_info())
+def out_info(c, name: str = '', full: bool = False):
+    print(VirtualMachine(Vbox().check_vm_names(name)).get_info(full=full))
+
+
+@task
+def group_list(c):
+    group_names = Vbox().get_group_list()
+    print(group_names)
+    return group_names
