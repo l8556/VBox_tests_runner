@@ -150,5 +150,5 @@ class DesktopTests:
             password_file = join(dirname(vm.get_parameter_info('CfgFile')), 'password')
             password = File.read(password_file).strip() if isfile(password_file) else None
             return password if password else self.data.config.get('password', None)
-        except TypeError:
+        except (TypeError, FileNotFoundError):
             return self.data.config.get('password', None)

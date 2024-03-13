@@ -27,6 +27,8 @@ def desktop_test(
         custom_config=False,
         headless=False
 ):
+    num_processes = int(processes) if processes else 1
+
     data = TestData(
         version=version if version else Prompt.ask('[red]Please enter version'),
         update_from=update_from,
@@ -35,15 +37,14 @@ def desktop_test(
         custom_config_mode=custom_config
     )
 
-    num_processes = int(processes) if processes else 1
-    report = DesktopReport(report_path=data.report_path)
-
     if num_processes > 1 and not name:
-        return multiprocess.run(data.version, data.vm_names, num_processes, 10)
+        data.status_bar = False
+        multiprocess.run(data, num_processes, 10, headless)
     else:
         for vm in Vbox().check_vm_names([name] if name else data.vm_names):
             DesktopTests(vm, data).run(headless=headless)
 
+    report = DesktopReport(report_path=data.report_path)
     report.get_full(data.version)
     report.send_to_tg(data.version, data.title, data.tg_token, data.tg_chat_id, data.update_from) if not name else ...
 
