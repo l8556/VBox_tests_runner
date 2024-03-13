@@ -25,13 +25,13 @@ class SshClient:
         self.close_ssh_chanel()
         self.close()
 
-    def connect(self, username: str, timeout: int = 300):
+    def connect(self, username: str, password: str = None, timeout: int = 300):
         print(f"[green]|INFO|{self.host_name}|{self.host}| Connect to host.")
         start_time = time.time()
         while time.time() - start_time < timeout:
             try:
                 self.load_keys()
-                self.client.connect(self.host, username=username)
+                self.client.connect(self.host, username=username, password=password)
                 self.create_ssh_chanel()
                 self.create_sftp_chanel()
                 print(f'[green]|INFO|{self.host_name}|{self.host}| Connected.')

@@ -31,7 +31,7 @@ class TestData:
         self.vm_names: list = self.config.get('hosts', [])
         self.title: str = self.config.get('title', 'Undefined_title')
         self.report_dir: str = join(self.project_dir, 'reports', self.title, self.version)
-        self.full_report_path: str = join(self.report_dir, f"{self.version}_{self.title}_desktop_tests_report.csv")
+        self.report_path: str = join(self.report_dir, f"{self.version}_{self.title}_desktop_tests_report.csv")
 
     @property
     def tg_token(self) -> str:

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
+from typing import Optional
 
 from .commands import Commands as cmd
 from subprocess import call, getoutput
@@ -15,6 +16,9 @@ class VirtualMachinException(Exception): ...
 class VirtualMachine:
     def __init__(self, vm_name: str):
         self.name = vm_name
+
+    def get_group_name(self) -> Optional[str]:
+        return self.get_parameter_info('groups').strip().replace('/', '')
 
     def network_adapter(
             self,
@@ -111,24 +115,24 @@ class VirtualMachine:
         :return: None
         """
         self._run_cmd(f"{cmd.modifyvm} {self.name} --spec-ctrl {'on' if turn_on else 'off'}")
-        print(f"[green]|INFO|{self.name}| Speculative Execution Control is {'on' if turn_on else 'off'}")
+        print(f"[green]|INFO|{self.name}| Speculative Execution Control is [cyan]{'on' if turn_on else 'off'}[/]")
 
     def audio(self, turn: bool):
         self._run_cmd(f"{cmd.modifyvm} {self.name} --audio-driver {'default' if turn else 'none'}")
-        print(f"[green]|INFO|{self.name}| Audio interface is {'on' if turn else 'off'}")
+        print(f"[green]|INFO|{self.name}| Audio interface is [cyan]{'on' if turn else 'off'}[/]")
 
     def nested_virtualization(self, turn: bool):
         _turn = 'on' if turn else 'off'
         self._run_cmd(f"{cmd.modifyvm} {self.name} --nested-hw-virt {_turn}")
-        print(f"[green]|INFO|{self.name}| Nested VT-x/AMD-V is {_turn}")
+        print(f"[green]|INFO|{self.name}| Nested VT-x/AMD-V is [cyan]{_turn}[/]")
 
     def set_cpus(self, num: int):
         self._run_cmd(f"{cmd.modifyvm} {self.name} --cpus {num}")
-        print(f"[green]|INFO|{self.name}| The number of processor cores is set to {num}")
+        print(f"[green]|INFO|{self.name}| The number of processor cores is set to [cyan]{num}[/]")
 
     def set_memory(self, num: int):
         self._run_cmd(f"{cmd.modifyvm} {self.name} --memory {num}")
-        print(f"[green]|INFO|{self.name}| Installed RAM quantity: {num}")
+        print(f"[green]|INFO|{self.name}| Installed RAM quantity: [cyan]{num}[/]")
 
     def wait_logged_user(self, timeout: int = 300, status_bar: bool = False) -> None:
         start_time = time.time()
@@ -139,7 +143,7 @@ class VirtualMachine:
             status.update(f"{status_msg}: {(time.time() - start_time):.00f}/{timeout}") if status_bar else ...
             user_name = self.get_logged_user()
             if user_name:
-                print(f'[green]|INFO|{self.name}| List of logged-in user {user_name}')
+                print(f'[green]|INFO|{self.name}| List of logged-in user [cyan]{user_name}[/].')
                 break
             time.sleep(1)
         else:
@@ -166,7 +170,7 @@ class VirtualMachine:
             status.update(f"{msg}: {(time.time() - start_time):.00f}/{timeout}") if status_bar else ...
             ip_address = self.get_ip()
             if ip_address:
-                print(f'[green]|INFO|{self.name}| The network adapter is running, ip: {ip_address}')
+                print(f'[green]|INFO|{self.name}| The network adapter is running, ip: [cyan]{ip_address}[/]')
                 break
             time.sleep(1)
         else:
@@ -222,11 +226,11 @@ class VirtualMachine:
 
     def delete_snapshot(self, name: str) -> None:
         self._run_cmd(f"{cmd.snapshot} {self.name} delete {name}")
-        print(f"[green]|INFO| Snapshot {name} deleted.")
+        print(f"[green]|INFO| Snapshot [cyan]{name}[/] deleted.")
 
     def rename_snapshot(self, old_name: str, new_name: str) -> None:
         self._run_cmd(f"{cmd.snapshot} {self.name} edit {old_name} --name {new_name}")
-        print(f"[green]|INFO| Snapshot {old_name} has been renamed to {new_name}")
+        print(f"[green]|INFO| Snapshot [cyan]{old_name}[/] has been renamed to [cyan]{new_name}[/]")
 
     def stop(self):
         print(f"[green]|INFO|{self.name}| Shutting down the virtual machine")
