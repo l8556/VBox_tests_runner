@@ -50,9 +50,9 @@ class VirtualMachine:
             f"--nic{adapter_number} {connect_type.lower() if turn else 'none'} {_get_name()}".strip()
         )
         print(
-            f'[green]|INFO| Network adapter is turn {"on" if turn else "off"} '
-            f'{("in " + connect_type.lower() + " mode") if turn else ""}'
-            f'{("adapter name: " + _get_name()) if _get_name() else ""}'.strip()
+            f'[green]|INFO| Network adapter is turn [cyan]{"on" if turn else "off"}[/] '
+            f'{("in [cyan]" + connect_type.lower() + "[/] mode") if turn else ""}'
+            f'{("adapter name: [cyan]" + _get_name() + "[/]") if _get_name() else ""}'.strip()
         )
 
     def shutdown(self):
