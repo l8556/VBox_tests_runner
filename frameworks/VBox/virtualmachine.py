@@ -54,7 +54,7 @@ class VirtualMachine:
             f'{("adapter name: " + _get_name()) if _get_name() else ""}'.strip()
         )
 
-    def send_shutdown_signal(self):
+    def shutdown(self):
         self._run_cmd(f"{cmd.controlvm} {self.name} acpipowerbutton")
 
     def wait_until_shutdown(self, timeout: int = 120) -> bool:
@@ -197,13 +197,6 @@ class VirtualMachine:
 
     def take_snapshot(self, name: str) -> None:
         self._run_cmd(f"{cmd.snapshot} {self.name} take {name}")
-
-    def status(self):
-        match self.check_status():
-            case True:
-                print(f"[green]|INFO|{self.name}| VirtualMachine is running")
-            case False:
-                print(f"[red]|INFO|{self.name}| VirtualMachine is poweroff")
 
     def check_status(self) -> bool:
         match self.get_parameter_info('VMState'):
