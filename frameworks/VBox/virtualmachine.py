@@ -50,8 +50,8 @@ class VirtualMachine:
 
         print(
             f'[green]|INFO| Network adapter is turn [cyan]{"on" if turn else "off"}[/] '
-            f'{("in [cyan]" + connect_type.lower() + "[/] mode") if turn else ""}'
-            f'{("adapter name: [cyan]" + _adapter_name + "[/]") if _adapter_name else ""}'.strip()
+            f'{f"in [cyan]{connect_type.lower()}[/] mode" if turn else ""}'
+            f'{f"adapter name: [cyan]{_adapter_name}[/]" if _adapter_name else ""}'.strip()
         )
 
     def shutdown(self):
