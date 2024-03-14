@@ -40,19 +40,18 @@ class VirtualMachine:
                 f"[red]|ERROR| Please enter correct connection type: nat, bridged, intnet, hostonly"
             )
 
-        def _get_name():
-            if adapter_name and turn and connect_type.lower() == 'bridged':
-                return f"--bridgeadapter{adapter_number} \"{adapter_name}\""
-            return ''
+        _adapter_name = f"--bridgeadapter{adapter_number} \"{adapter_name}\"" \
+            if adapter_name and turn and connect_type.lower() == 'bridged' else ''
 
         self._run_cmd(
             f"{cmd.modifyvm} {self.name} "
-            f"--nic{adapter_number} {connect_type.lower() if turn else 'none'} {_get_name()}".strip()
+            f"--nic{adapter_number} {connect_type.lower() if turn else 'none'} {_adapter_name}".strip()
         )
+
         print(
             f'[green]|INFO| Network adapter is turn [cyan]{"on" if turn else "off"}[/] '
             f'{("in [cyan]" + connect_type.lower() + "[/] mode") if turn else ""}'
-            f'{("adapter name: [cyan]" + _get_name() + "[/]") if _get_name() else ""}'.strip()
+            f'{("adapter name: [cyan]" + _adapter_name + "[/]") if _adapter_name else ""}'.strip()
         )
 
     def shutdown(self):
