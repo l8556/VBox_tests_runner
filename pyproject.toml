@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "vbox-control"
+name = "VBox Tests Runner"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
+authors = ["l02 <l8556@outlook.com>"]
 readme = "README.md"
-packages = [{include = "vbox_control"}]
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -17,6 +17,7 @@ distro = "^1.8.0"
 pandas = "*"
 host-tools = { git = "https://github.com/l8556/host_tools.git", branch = "master" }
 telegram = { git = "https://github.com/l8556/TelegramApi.git", branch = "master" }
+VBox = { git = "https://github.com/l8556/VBox_Wrapper.git", branch = "feature/minor-refactoring" }
 
 
 [build-system]

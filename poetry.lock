@@ -1306,7 +1306,25 @@ h2 = ["h2 (>=4,<5)"]
 socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
 
+[[package]]
+name = "vbox"
+version = "0.1.0"
+description = ""
+optional = false
+python-versions = ">=3.7.0,<4.0"
+files = []
+develop = false
+
+[package.dependencies]
+rich = "*"
+
+[package.source]
+type = "git"
+url = "https://github.com/l8556/VBox_Wrapper.git"
+reference = "feature/minor-refactoring"
+resolved_reference = "1694cebc9f1a1131f257d5795888a5e3060a273d"
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "d64a0d346e57d826bdf7d38437f05c0bc4dbb699504e1e49160372f1bb081dd8"
+content-hash = "57f077d4c1379f99fa277e8fb2dc30d28be1eba199eea40ab207181c4c156a83"

@@ -5,8 +5,7 @@ from typing import Optional
 
 from host_tools.utils import Dir
 
-from frameworks.VBox import VirtualMachine
-from frameworks.VBox.virtualmachine import VirtualMachinException
+from VBox import VirtualMachine, VirtualMachinException
 from frameworks.console import MyConsole
 from frameworks.decorators import retry
 from host_tools import File
