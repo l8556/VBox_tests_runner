@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "VBox Tests Runner"
+name = "VBox_Tests_Runner"
 version = "0.1.0"
 description = ""
 authors = ["l02 <l8556@outlook.com>"]
