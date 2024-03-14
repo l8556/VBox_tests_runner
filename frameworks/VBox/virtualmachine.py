@@ -18,7 +18,8 @@ class VirtualMachine:
         self.name = vm_name
 
     def get_group_name(self) -> Optional[str]:
-        return self.get_parameter_info('groups').strip().replace('/', '')
+        group_name = self.get_parameter_info('groups')
+        return group_name.strip().replace('/', '') if group_name else None
 
     def network_adapter(
             self,
@@ -39,22 +40,21 @@ class VirtualMachine:
                 f"[red]|ERROR| Please enter correct connection type: nat, bridged, intnet, hostonly"
             )
 
-        def _get_name():
-            if adapter_name and turn and connect_type.lower() == 'bridged':
-                return f"--bridgeadapter{adapter_number} \"{adapter_name}\""
-            return ''
+        _adapter_name = f"--bridgeadapter{adapter_number} \"{adapter_name}\"" \
+            if adapter_name and turn and connect_type.lower() == 'bridged' else ''
 
         self._run_cmd(
             f"{cmd.modifyvm} {self.name} "
-            f"--nic{adapter_number} {connect_type.lower() if turn else 'none'} {_get_name()}".strip()
-        )
-        print(
-            f'[green]|INFO| Network adapter is turn {"on" if turn else "off"} '
-            f'{("in " + connect_type.lower() + " mode") if turn else ""}'
-            f'{("adapter name: " + _get_name()) if _get_name() else ""}'.strip()
+            f"--nic{adapter_number} {connect_type.lower() if turn else 'none'} {_adapter_name}".strip()
         )
 
-    def send_shutdown_signal(self):
+        print(
+            f'[green]|INFO| Network adapter is turn [cyan]{"on" if turn else "off"}[/] '
+            f'{f"in [cyan]{connect_type.lower()}[/] mode" if turn else ""}'
+            f'{f"adapter name: [cyan]{_adapter_name}[/]" if _adapter_name else ""}'.strip()
+        )
+
+    def shutdown(self) -> None:
         self._run_cmd(f"{cmd.controlvm} {self.name} acpipowerbutton")
 
     def wait_until_shutdown(self, timeout: int = 120) -> bool:
@@ -66,8 +66,8 @@ class VirtualMachine:
             time.sleep(1)
         return False
 
-    def adapter_list(self):
-        return self._run_cmd(f"{cmd.vboxmanage} list bridgedifs")
+    def adapter_list(self) -> None:
+        self._run_cmd(f"{cmd.vboxmanage} list bridgedifs")
 
     def copy(self, path_from: str, path_to: str, username: str, password: str) -> None:
         self._run_cmd(
@@ -91,21 +91,21 @@ class VirtualMachine:
             f"\"echo -e '{password}\\n{new_password}\\n{new_password}' | passwd {username}\""
         )
 
-    def delete(self, path: str, username: str, password: str):
+    def delete(self, path: str, username: str, password: str) -> None:
         self._run_cmd(
             f"{cmd.guestcontrol} {self.name} run "
             f"--username {username} --password {password} "
             f"--wait-stdout -- /bin/rm -rf {path}"
         )
 
-    def run_cmd(self, command: str, username: str, password: str):
+    def run_cmd(self, command: str, username: str, password: str) -> None:
         self._run_cmd(
             f"{cmd.guestcontrol} {self.name} run "
             f"--username {username} --password {password} "
             f"--wait-stdout -- /bin/bash -c '{command}'"
         )
 
-    def speculative_execution_control(self, turn_on: bool = True):
+    def speculative_execution_control(self, turn_on: bool = True) -> None:
         """
         Speculative Execution Control is a mechanism
         used to reduce the vulnerability of Spectre and Meltdown at the level of the host operating system.
@@ -117,20 +117,20 @@ class VirtualMachine:
         self._run_cmd(f"{cmd.modifyvm} {self.name} --spec-ctrl {'on' if turn_on else 'off'}")
         print(f"[green]|INFO|{self.name}| Speculative Execution Control is [cyan]{'on' if turn_on else 'off'}[/]")
 
-    def audio(self, turn: bool):
+    def audio(self, turn: bool) -> None:
         self._run_cmd(f"{cmd.modifyvm} {self.name} --audio-driver {'default' if turn else 'none'}")
         print(f"[green]|INFO|{self.name}| Audio interface is [cyan]{'on' if turn else 'off'}[/]")
 
-    def nested_virtualization(self, turn: bool):
+    def nested_virtualization(self, turn: bool) -> None:
         _turn = 'on' if turn else 'off'
         self._run_cmd(f"{cmd.modifyvm} {self.name} --nested-hw-virt {_turn}")
         print(f"[green]|INFO|{self.name}| Nested VT-x/AMD-V is [cyan]{_turn}[/]")
 
-    def set_cpus(self, num: int):
+    def set_cpus(self, num: int) -> None:
         self._run_cmd(f"{cmd.modifyvm} {self.name} --cpus {num}")
         print(f"[green]|INFO|{self.name}| The number of processor cores is set to [cyan]{num}[/]")
 
-    def set_memory(self, num: int):
+    def set_memory(self, num: int) -> None:
         self._run_cmd(f"{cmd.modifyvm} {self.name} --memory {num}")
         print(f"[green]|INFO|{self.name}| Installed RAM quantity: [cyan]{num}[/]")
 
@@ -161,7 +161,7 @@ class VirtualMachine:
                 return output.split(':')[1].strip()
         return None
 
-    def wait_net_up(self, timeout: int = 300, status_bar: bool = False):
+    def wait_net_up(self, timeout: int = 300, status_bar: bool = False) -> None:
         start_time = time.time()
         msg = f"[cyan]|INFO|{self.name}| Waiting for network adapter up"
         status = console.status(msg)
@@ -198,13 +198,6 @@ class VirtualMachine:
     def take_snapshot(self, name: str) -> None:
         self._run_cmd(f"{cmd.snapshot} {self.name} take {name}")
 
-    def status(self):
-        match self.check_status():
-            case True:
-                print(f"[green]|INFO|{self.name}| VirtualMachine is running")
-            case False:
-                print(f"[red]|INFO|{self.name}| VirtualMachine is poweroff")
-
     def check_status(self) -> bool:
         match self.get_parameter_info('VMState'):
             case "poweroff":
@@ -232,7 +225,7 @@ class VirtualMachine:
         self._run_cmd(f"{cmd.snapshot} {self.name} edit {old_name} --name {new_name}")
         print(f"[green]|INFO| Snapshot [cyan]{old_name}[/] has been renamed to [cyan]{new_name}[/]")
 
-    def stop(self):
+    def stop(self) -> None:
         print(f"[green]|INFO|{self.name}| Shutting down the virtual machine")
         self._run_cmd(f'{cmd.controlvm} {self.name} poweroff')
         self.wait_until_shutdown()
