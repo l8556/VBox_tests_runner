@@ -19,9 +19,7 @@ class VirtualMachine:
 
     def get_group_name(self) -> Optional[str]:
         group_name = self.get_parameter_info('groups')
-        if group_name:
-            return group_name.strip().replace('/', '')
-        return None
+        return group_name.strip().replace('/', '') if group_name else None
 
     def network_adapter(
             self,
