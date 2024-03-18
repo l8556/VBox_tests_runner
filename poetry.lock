@@ -1322,7 +1322,7 @@ rich = "*"
 type = "git"
 url = "https://github.com/l8556/VBoxWrapper.git"
 reference = "feature/minor-refactoring"
-resolved_reference = "faa706c8e3624c32e43a82d06cbca0e8446cd3fe"
+resolved_reference = "0198f640bad6cf4bed84b39584b17099e8f9991c"
 
 [metadata]
 lock-version = "2.0"
