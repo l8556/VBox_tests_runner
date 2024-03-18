@@ -5,7 +5,7 @@ from invoke import task
 from rich.prompt import Prompt
 from rich import print
 
-from VBox import VirtualMachine, Vbox
+from VBoxWrapper import VirtualMachine, Vbox
 from tests.data import TestData
 from tests.desktop_tests import DesktopTests
 import tests.multiprocessing as multiprocess

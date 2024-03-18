@@ -17,7 +17,7 @@ distro = "^1.8.0"
 pandas = "*"
 host-tools = { git = "https://github.com/l8556/host_tools.git", branch = "master" }
 telegram = { git = "https://github.com/l8556/TelegramApi.git", branch = "master" }
-VBox = { git = "https://github.com/l8556/VBox_Wrapper.git", branch = "feature/minor-refactoring" }
+VBoxWrapper = { git = "https://github.com/l8556/VBoxWrapper.git", branch = "feature/minor-refactoring" }
 
 
 [build-system]
