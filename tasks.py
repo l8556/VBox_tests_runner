@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import os
 from os.path import join
+
 from invoke import task
 from rich.prompt import Prompt
 from rich import print
@@ -11,6 +11,8 @@ from tests.desktop_tests import DesktopTests
 import tests.multiprocessing as multiprocess
 from frameworks.console import MyConsole
 from tests.tools.desktop_report import DesktopReport
+from host_tools import Process, Service
+from elevate import elevate
 
 console = MyConsole().console
 print = console.print
@@ -93,3 +95,9 @@ def group_list(c):
     group_names = Vbox().get_group_list()
     print(group_names)
     return group_names
+
+@task
+def reset_vbox(c):
+    elevate(show_console=False)
+    Process.terminate(['VBoxSVC'])
+    Service.restart("VBoxSDS")
