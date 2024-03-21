@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from os import getcwd
 from os.path import join
 
 from invoke import task
@@ -35,7 +36,7 @@ def desktop_test(
         version=version if version else Prompt.ask('[red]Please enter version'),
         update_from=update_from,
         telegram=detailed_telegram,
-        config_path=join(os.getcwd(), 'custom_config.json') if custom_config else join(os.getcwd(), 'config.json'),
+        config_path=join(getcwd(), 'custom_config.json') if custom_config else join(getcwd(), 'config.json'),
         custom_config_mode=custom_config
     )
 
