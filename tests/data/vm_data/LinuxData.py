@@ -15,7 +15,7 @@ class LinuxData(VmData):
         self.script_path = join(self.home_dir, 'script.sh')
         self.script_dir = join(self.home_dir, 'scripts')
         self.desktop_testing_path = join(self.script_dir, splitext(basename(self.desktop_testing_url))[0])
-        self.report_path = join(self.desktop_testing_path, 'reports')
+        self.report_dir = join(self.desktop_testing_path, 'reports')
         self.custom_config_path = join(self.script_dir, 'custom_config.json')
         self.tg_dir = join(self.home_dir, '.telegram')
         self.tg_token_file = join(self.tg_dir, 'token')

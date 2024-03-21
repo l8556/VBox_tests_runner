@@ -411,8 +411,18 @@ files = [
 ]
 
 [[package]]
+name = "elevate"
+version = "0.1.3"
+description = "Python library for requesting root privileges"
+optional = false
+python-versions = "*"
+files = [
+    {file = "elevate-0.1.3.tar.gz", hash = "sha256:53ad19fa1de301fb1de3f8768fb3a5894215716fd96a475690c4d0ff3b1de209"},
+]
+
+[[package]]
 name = "host-tools"
-version = "2.03"
+version = "2.05"
 description = ""
 optional = false
 python-versions = ">=3.7.0,<4.0"
@@ -431,7 +441,7 @@ rich = "*"
 type = "git"
 url = "https://github.com/l8556/host_tools.git"
 reference = "master"
-resolved_reference = "4189601e703dbb1aad15271eae885c18620110e9"
+resolved_reference = "3582eccc3ff2dae9de5bfd131f5154a3610f22b5"
 
 [[package]]
 name = "idna"
@@ -1306,7 +1316,25 @@ h2 = ["h2 (>=4,<5)"]
 socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
 
+[[package]]
+name = "vboxwrapper"
+version = "0.1.0"
+description = ""
+optional = false
+python-versions = ">=3.7.0,<4.0"
+files = []
+develop = false
+
+[package.dependencies]
+rich = "*"
+
+[package.source]
+type = "git"
+url = "https://github.com/l8556/VBoxWrapper.git"
+reference = "master"
+resolved_reference = "72c4442fc9f85a9e7625e5961e61ebd47613dd16"
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "d64a0d346e57d826bdf7d38437f05c0bc4dbb699504e1e49160372f1bb081dd8"
+content-hash = "1e22832b458f0c7433af335768a7040deef38ab616402d19be032e42d908b5d9"
