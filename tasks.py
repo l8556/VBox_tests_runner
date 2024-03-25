@@ -56,9 +56,9 @@ def desktop_test(
 def run_vm(c, name: str = '', headless=False):
     vm = VirtualMachine(Vbox().check_vm_names(name))
     vm.run(headless=headless)
-    vm.network_adapter.wait_up(status_bar=True)
+    vm.network.wait_up(status_bar=True)
     vm.wait_logged_user(status_bar=True)
-    return print(f"[green]ip: [red]{vm.network_adapter.get_ip()}[/]\nuser: [red]{vm.get_logged_user()}[/]")
+    return print(f"[green]ip: [red]{vm.network.get_ip()}[/]\nuser: [red]{vm.get_logged_user()}[/]")
 
 
 @task
