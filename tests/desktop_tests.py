@@ -39,7 +39,7 @@ class DesktopTests:
         vm = VirtualMachine(self.vm_name)
         try:
             self.run_vm(vm, headless=headless)
-            self.vm_data = self._create_vm_data(vm.get_logged_user(), vm.network_adapter.get_ip())
+            self.vm_data = self._create_vm_data(vm.get_logged_user(), vm.network.get_ip())
             self._clean_know_hosts(self.vm_data.ip)
             self.run_script_on_vm(user_password=self._get_user_password(vm))
         except VirtualMachinException:
@@ -57,7 +57,7 @@ class DesktopTests:
         vm.snapshot.restore()
         self.configurate_virtual_machine(vm)
         vm.run(headless=headless)
-        vm.network_adapter.wait_up(status_bar=self.data.status_bar, timeout=600)
+        vm.network.wait_up(status_bar=self.data.status_bar, timeout=600)
         vm.wait_logged_user(status_bar=self.data.status_bar, timeout=600)
         return vm
 
