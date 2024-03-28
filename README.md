@@ -1,4 +1,4 @@
-# VBox_control
+# VBox tests runner
 
 ## Description
 A project for running tests inside Vbox virtual machines
