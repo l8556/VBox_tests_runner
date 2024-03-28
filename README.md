@@ -50,4 +50,4 @@ To activate the virtual environment, run the command
 
 `--processes` or `-p` - Number of threads. to run tests in multithreaded mode
 
-`--name` or `-n` - name of the virtual machine to selectively run tests
+`--name` or `-n` - Name of the virtual machine to selectively run tests
