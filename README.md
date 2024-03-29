@@ -1,6 +1,7 @@
 # VBox tests runner
 
 ## Description
+
 A project for running tests inside Vbox virtual machines
 
 ## Requirements
@@ -24,15 +25,17 @@ To activate the virtual environment, run the command
 
 * Change config.json file.
 
-#### Config parameters
+### Config parameters
 
 `desktop_script` - link to a repository with a script to run in a virtual machine
 
 `branch` - branch from which the script will be downloaded. (default is 'master')
 
-`token_file` - name of the file containing the telegram token located at `~/.telegram` folder
+`token_file` - name of the file containing the telegram token
+located at `~/.telegram` folder
 
-`chat_id_file` - name of the file containing the telegram chat id located at `~/.telegram` folder
+`chat_id_file` - name of the file containing the telegram chat id
+located at `~/.telegram` folder
 
 `password` - password from the virtual machine user.
 
