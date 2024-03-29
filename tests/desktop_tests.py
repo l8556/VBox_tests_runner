@@ -114,8 +114,8 @@ class DesktopTests:
 
     def _download_report(self, ssh: SshClient):
         try:
-            remote_path = f"{self.vm_data.report_dir}/{self.data.title}/{self.data.version}" # todo
-            ssh.download_dir(remote_path, self.report.dir)
+            remote_report_dir = f"{self.vm_data.report_dir}/{self.data.title}/{self.data.version}"
+            ssh.download_dir(remote_report_dir, self.report.dir)
             if self.report.column_is_empty("Os"):
                 raise FileNotFoundError
             self.report.insert_vm_name(self.vm_name)
