@@ -3,11 +3,11 @@ import time
 import concurrent.futures
 
 from tests.data import TestData
-from tests.desktop_tests import DesktopTests
+from tests.desktop_tests import DesktopTest
 
 
 def run_test(vm_name, data, headless):
-    DesktopTests(vm_name=vm_name, test_data=data, vm_cpus=4, vm_memory=3096).run(headless=headless)
+    DesktopTest(vm_name=vm_name, test_data=data, vm_cpus=4, vm_memory=3096).run(headless=headless)
 
 
 def run(data: TestData, max_processes: int = 1, vm_startup_delay: int | float = 0, headless: bool = False):

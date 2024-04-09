@@ -441,7 +441,7 @@ rich = "*"
 type = "git"
 url = "https://github.com/l8556/host_tools.git"
 reference = "master"
-resolved_reference = "420be71cc501f3edbd498f8dfb1df4cfe2a48dce"
+resolved_reference = "73814697b3dbc6cce307bb2e553d2a7fd185a787"
 
 [[package]]
 name = "idna"
@@ -1258,6 +1258,25 @@ files = [
 ]
 
 [[package]]
+name = "ssh-wrapper"
+version = "0.1.0"
+description = ""
+optional = false
+python-versions = "^3.11"
+files = []
+develop = false
+
+[package.dependencies]
+paramiko = "^3"
+rich = "^13"
+
+[package.source]
+type = "git"
+url = "https://github.com/l8556/SshWrapper.git"
+reference = "master"
+resolved_reference = "d79039e85cf7fff0c33088b0b05745894f116069"
+
+[[package]]
 name = "telegram"
 version = "2.0"
 description = ""
@@ -1275,7 +1294,7 @@ rich = "*"
 type = "git"
 url = "https://github.com/l8556/TelegramApi.git"
 reference = "master"
-resolved_reference = "a1cd015463d34d92d9678f71e341f4b78598d102"
+resolved_reference = "e04683c8cb74555b4383150528644210287c77db"
 
 [[package]]
 name = "texttable"
@@ -1337,4 +1356,4 @@ resolved_reference = "3c1a891a930eb3ee550f8c704f84f61b02347ffd"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "1e22832b458f0c7433af335768a7040deef38ab616402d19be032e42d908b5d9"
+content-hash = "0afdc4524fa91611992dbf580f9f944cb9ccee0e7a68ac0cf64cd0b9e021dc46"

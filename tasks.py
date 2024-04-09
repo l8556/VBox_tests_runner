@@ -8,7 +8,7 @@ from rich import print
 
 from VBoxWrapper import VirtualMachine, Vbox
 from tests.data import TestData
-from tests.desktop_tests import DesktopTests
+from tests.desktop_tests import DesktopTest
 import tests.multiprocessing as multiprocess
 from frameworks.console import MyConsole
 from tests.tools.desktop_report import DesktopReport
@@ -45,7 +45,7 @@ def desktop_test(
         multiprocess.run(data, num_processes, 10, headless)
     else:
         for vm in Vbox().check_vm_names([name] if name else data.vm_names):
-            DesktopTests(vm, data).run(headless=headless)
+            DesktopTest(vm, data).run(headless=headless)
 
     report = DesktopReport(report_path=data.report_path)
     report.get_full(data.version)
