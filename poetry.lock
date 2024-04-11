@@ -441,7 +441,7 @@ rich = "*"
 type = "git"
 url = "https://github.com/l8556/host_tools.git"
 reference = "master"
-resolved_reference = "73814697b3dbc6cce307bb2e553d2a7fd185a787"
+resolved_reference = "3fe53565500f3f35165c903444607949345ea442"
 
 [[package]]
 name = "idna"
@@ -1294,7 +1294,7 @@ rich = "*"
 type = "git"
 url = "https://github.com/l8556/TelegramApi.git"
 reference = "master"
-resolved_reference = "e04683c8cb74555b4383150528644210287c77db"
+resolved_reference = "ebd6e32f41dd5eeec8f5c691d596035edb0096c0"
 
 [[package]]
 name = "texttable"
